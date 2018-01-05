@@ -2,9 +2,11 @@
 
 ## Guide
 
-* Complex Data Visualization
+* Complex Data-Visualization
 
-The following folders has all the codes needed for the course.
+This folder contained all the codes needed for data visualization.
 
+* Matlab_Vis
 
 * Python_Vis
+

@@ -1,0 +1,166 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Wind</title><meta name="generator" content="MATLAB 8.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-10-06"><meta name="DC.source" content="Wind.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><p>This is an example of how to create wind flow visualization in MATLAB&reg;.</p><p>Read about the <a href="http://www.mathworks.com/help/matlab/ref/isosurface.html"><tt>isosurface</tt></a>, <a href="http://www.mathworks.com/help/matlab/ref/isonormals.html"><tt>isonormals</tt></a>, <a href="http://www.mathworks.com/help/matlab/ref/isocaps.html"><tt>isocaps</tt></a>, <a href="http://www.mathworks.com/help/matlab/ref/coneplot.html"><tt>coneplot</tt></a>, <a href="http://www.mathworks.com/help/matlab/ref/streamline.html"><tt>streamline</tt></a>, <a href="http://www.mathworks.com/help/matlab/ref/patch.html"><tt>patch</tt></a>, and <a href="http://www.mathworks.com/help/matlab/ref/reducepatch.html"><tt>reducepatch</tt></a> functions in the MATLAB documentation.</p><p>For more examples, go to <a href="http://www.mathworks.com/discovery/gallery.html">MATLAB Plot Gallery</a></p><pre class="codeinput"><span class="comment">% Load wind data</span>
+load <span class="string">wind</span> <span class="string">x</span> <span class="string">y</span> <span class="string">z</span> <span class="string">u</span> <span class="string">v</span> <span class="string">w</span>
+
+<span class="comment">% Compute speed</span>
+spd = sqrt(u.*u + v.*v + w.*w);
+
+figure
+
+<span class="comment">% Create isosurface patch</span>
+p = patch(isosurface(x, y, z, spd, 40));
+isonormals(x, y, z, spd, p)
+set(p, <span class="string">'FaceColor'</span>, <span class="string">'red'</span>, <span class="string">'EdgeColor'</span>, <span class="string">'none'</span>)
+
+<span class="comment">% Create isosurface end-caps</span>
+p2 = patch(isocaps(x, y, z, spd, 40));
+set(p2, <span class="string">'FaceColor'</span>, <span class="string">'interp'</span>, <span class="string">'EdgeColor'</span>, <span class="string">'none'</span>)
+
+<span class="comment">% Adjust aspect ratio</span>
+daspect([1 1 1])
+
+<span class="comment">% Downsample patch</span>
+[f, verts] = reducepatch(isosurface(x, y, z, spd, 30), .2);
+
+<span class="comment">% Create coneplot (velocity cone)</span>
+h = coneplot(x, y, z, u, v, w, verts(:, 1), verts(:, 2), verts(:, 3), 2);
+set(h, <span class="string">'FaceColor'</span>, <span class="string">'cyan'</span>, <span class="string">'EdgeColor'</span>, <span class="string">'none'</span>)
+
+<span class="comment">% Create streamline</span>
+[sx, sy, sz] = meshgrid(80, 20:10:50, 0:5:15);
+h2 = streamline(x, y, z, u, v, w, sx, sy, sz);
+set(h2, <span class="string">'Color'</span>, [.4 1 .4])
+
+<span class="comment">% Adjust colormap and axes settings</span>
+colormap(jet)
+box <span class="string">on</span>
+axis <span class="string">tight</span>
+camproj <span class="string">perspective</span>
+camva(34)
+campos([165 -20 65])
+camtarget([100 40 -5])
+camlight <span class="string">left</span>
+lighting <span class="string">gouraud</span>
+</pre><img vspace="5" hspace="5" src="Wind_01.png" alt=""> <p class="footer">Copyright 2012-2014 The MathWorks, Inc.<br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%%
+% This is an example of how to create wind flow visualization in MATLAB&#174;.
+% 
+% Read about the <http://www.mathworks.com/help/matlab/ref/isosurface.html |isosurface|>, <http://www.mathworks.com/help/matlab/ref/isonormals.html |isonormals|>, <http://www.mathworks.com/help/matlab/ref/isocaps.html |isocaps|>, <http://www.mathworks.com/help/matlab/ref/coneplot.html |coneplot|>, <http://www.mathworks.com/help/matlab/ref/streamline.html |streamline|>, <http://www.mathworks.com/help/matlab/ref/patch.html |patch|>, and <http://www.mathworks.com/help/matlab/ref/reducepatch.html |reducepatch|> functions in the MATLAB documentation.
+%
+% For more examples, go to <http://www.mathworks.com/discovery/gallery.html MATLAB Plot Gallery>
+%
+% Copyright 2012-2014 The MathWorks, Inc.
+
+% Load wind data
+load wind x y z u v w
+
+% Compute speed
+spd = sqrt(u.*u + v.*v + w.*w);
+
+figure
+
+% Create isosurface patch
+p = patch(isosurface(x, y, z, spd, 40));
+isonormals(x, y, z, spd, p)
+set(p, 'FaceColor', 'red', 'EdgeColor', 'none')
+
+% Create isosurface end-caps
+p2 = patch(isocaps(x, y, z, spd, 40));
+set(p2, 'FaceColor', 'interp', 'EdgeColor', 'none')
+
+% Adjust aspect ratio
+daspect([1 1 1])
+
+% Downsample patch
+[f, verts] = reducepatch(isosurface(x, y, z, spd, 30), .2);
+
+% Create coneplot (velocity cone)
+h = coneplot(x, y, z, u, v, w, verts(:, 1), verts(:, 2), verts(:, 3), 2);
+set(h, 'FaceColor', 'cyan', 'EdgeColor', 'none')
+
+% Create streamline
+[sx, sy, sz] = meshgrid(80, 20:10:50, 0:5:15);
+h2 = streamline(x, y, z, u, v, w, sx, sy, sz);
+set(h2, 'Color', [.4 1 .4])
+
+% Adjust colormap and axes settings
+colormap(jet)
+box on
+axis tight
+camproj perspective
+camva(34)
+campos([165 -20 65])
+camtarget([100 40 -5])
+camlight left
+lighting gouraud
+
+##### SOURCE END #####
+--></body></html>
