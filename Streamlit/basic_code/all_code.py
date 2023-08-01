@@ -103,6 +103,7 @@ st.write("In this example we highlight the highest value in each column")
 
 st.write("We can also customize the dataframe to show plots in the cells")
 
+
 code = """
 df = pd.DataFrame(
     {
