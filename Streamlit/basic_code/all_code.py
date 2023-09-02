@@ -1,16 +1,12 @@
-"To install stream lit use pip install streamlit"
+""""To install stream lit use pip install streamlit"""
 
 import streamlit as st
 import numpy as np
 import pandas as pd
 import random
 import datetime
-from io import StringIO
-
-
 
 # Basic building blocks of streamlit
-
 
 # Display text in the form of a title
 st.title("Streamlit 101")
@@ -23,14 +19,17 @@ st.markdown("""___""")  # to add a horizontal line
 
 
 # creating a markdown
-st.markdown("Streamlit is an open-source Python library that allows developers to create interactive, web-based data applications quickly. It's designed to make data exploration, model prototyping, and creating interactive dashboards intuitive and straightforward.")
+st.markdown("Streamlit is an open-source Python library that allows developers to create interactive, "
+            "web-based data applications quickly. It's designed to make data exploration, model prototyping, "
+            "and creating interactive dashboards intuitive and straightforward.")
 
 
 st.header("Displaying text using streamlit")
 
 # Creating text elements like headers, subheaders, text, markdown, etc.
 
-st.write("Create the text elements such as headers, subheaders, text, markdown, etc. using st.header(), st.subheader(), st.text(), st.markdown()")
+st.write("Create the text elements such as headers, subheaders, text, markdown, etc. using st.header(), "
+         "st.subheader(), st.text(), st.markdown()")
 code = """st.title("Body")
 st.header("Body")
 st.subheader("Body")
@@ -47,7 +46,8 @@ st.code(code, language='python')  # to display code
 
 
 st.subheader("Display without using st.write()")
-st.write("If there is a variable, we can directly show it just by writing its name and streamlit will automatically understand its type and display it accordingly")
+st.write("If there is a variable, we can directly show it just by writing its name and streamlit will "
+         "automatically understand its type and display it accordingly")
 
 
 code = """output_text = "show the variable without calling st.write()"
@@ -57,7 +57,6 @@ st.code(code, language='python')
 
 output_text = "show the variable without calling st.write()"
 st.write("***This is an example of not using st.write()***")
-output_text
 
 st.divider()
 
@@ -161,8 +160,10 @@ st.divider()
 
 st.subheader("Displaying charts using streamlit")
 
-st.write("We can output the visualizations using any of the python visualization libraries such as matplotlib, seaborn, plotly, etc.I recommend using seaborn and plotly for better visualization.")
-st.write("On top of it, streamlit also has an inbuilt visualization library. We can use st.line_chart(), st.area_chart(), st.bar_chart(), st.pyplot(), st.vega_lite_chart(), st.altair_chart(), st.plotly_chart() to display the charts")
+st.write("We can output the visualizations using any of the python visualization libraries such as matplotlib,"
+         " seaborn, plotly, etc.I recommend using seaborn and plotly for better visualization.")
+st.write("On top of it, streamlit also has an inbuilt visualization library. We can use st.line_chart(), "
+         "st.area_chart(), st.bar_chart(), st.pyplot(), st.vega_lite_chart(), st.altair_chart(), st.plotly_chart() to display the charts")
 
 st.write("***Line chart***")
 
@@ -260,7 +261,7 @@ st.code(code, language='python')
 
 page_names = ["Comedy", "Drama", "Documentary"]
 genre = st.radio(
-    "What's your favorite movie genre",page_names)
+    "What's your favorite movie genre", page_names)
 
 st.write("***You have selected:***", genre)
 
@@ -295,15 +296,15 @@ st.write('***You study in***', option)"""
 
 st.code(code, language='python')
 
-school_list = ["Columbian College of Arts & Sciences","Corcoran School of the Arts & Design",
-               "School of Business","Graduate School of Education & Human Development",
-               "School of Engineering & Applied Science","School of Medicine & Health Sciences",
-               "Elliott School of International Affairs","Milken Institute School of Public Health","GW Law",
-               "School of Media & Public Affairs","School of Medicine & Health Sciences","School of Nursing",
+school_list = ["Columbian College of Arts & Sciences", "Corcoran School of the Arts & Design",
+               "School of Business", "Graduate School of Education & Human Development",
+               "School of Engineering & Applied Science", "School of Medicine & Health Sciences",
+               "Elliott School of International Affairs", "Milken Institute School of Public Health", "GW Law",
+               "School of Media & Public Affairs", "School of Medicine & Health Sciences", "School of Nursing",
                "Graduate School of Political Management"]
 
 option = st.selectbox(
-    '***In which school do you study in GWU?***',school_list)
+    '***In which school do you study in GWU?***', school_list)
 
 st.write('***You study in :***', option)
 
@@ -320,11 +321,11 @@ st.write("here are the list of your favorite colors", selection)"""
 
 st.code(code, language='python')
 
-color_list = ["Red","Blue","Green","Yellow","Orange","Purple","Pink","Brown","Black","White"]
+color_list = ["Red", "Blue", "Green", "Yellow", "Orange", "Purple", "Pink", "Brown", "Black", "White"]
 
 selection = st.multiselect('Which colors do you like?', color_list)
 
-st.write("You have selected ",len(selection), "colors")
+st.write("You have selected ", len(selection), "colors")
 st.write("here are the list of your favorite colors", selection)
 
 
@@ -418,4 +419,3 @@ uploaded_file = st.file_uploader("Choose a file")
 if uploaded_file is not None:
     dataframe = pd.read_csv(uploaded_file)
     st.write(dataframe)
-
