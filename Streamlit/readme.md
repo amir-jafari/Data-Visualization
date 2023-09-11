@@ -1,3 +1,13 @@
-to run the code 
-install the dependencies from requirements.txt
-and run streamlit run app.py
+## Windows Users:
+
+1. Go to File -> Settings -> Tools -> Terminal.
+
+2.Replace the value in Shell path with
+
+```
+powershell.exe -ExecutionPolicy ByPass -NoExit -Command "& conda activate <yourcondaenvname>
+```
+***
+## Run code
+1. Install the dependencies from requirements.txt
+2. un streamlit run <Filename.py>
