@@ -10,4 +10,6 @@ powershell.exe -ExecutionPolicy ByPass -NoExit -Command "& conda activate <yourc
 ***
 ## Run code
 1. Install the dependencies from requirements.txt
-2. un streamlit run <Filename.py>
+2. Run streamlit 
+   * streamlit run <Filename.py>
+   * python -m streamlit <Filename.py>
