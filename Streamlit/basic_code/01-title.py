@@ -16,5 +16,36 @@ code = """df = pd.DataFrame(
 st.dataframe(df)"""
 st.code(code, language="python")
 
+# %%--------------------------------------------------------------------------------------------------------------------
+st.divider()
+st.latex(r'''
+    a + ar + a r^2 + a r^3 + \cdots + a r^{n-1} =
+    \sum_{k=0}^{n-1} ar^k =
+    a \left(\frac{1-r^{n}}{1-r}\right)
+    ''')
+
+# %%--------------------------------------------------------------------------------------------------------------------
+st.divider()
+
+st.markdown("*Streamlit* is **really** ***cool***.")
+st.markdown('''
+    :red[Streamlit] :orange[can] :green[write] :blue[text] :violet[in]
+    :gray[pretty] :rainbow[colors].''')
+st.markdown("Here's a bouquet &mdash;\
+            :tulip::cherry_blossom::rose::hibiscus::sunflower::blossom:")
+
+# %%--------------------------------------------------------------------------------------------------------------------
+st.divider()
+
+md = st.text_area('Type in your markdown string (without outer quotes)',
+                  "Happy Streamlit-ing! :balloon:")
+
+st.code(f"""
+import streamlit as st
+
+st.markdown('''{md}''')
+""")
+
+st.markdown(md)
 
 print('Amir')
