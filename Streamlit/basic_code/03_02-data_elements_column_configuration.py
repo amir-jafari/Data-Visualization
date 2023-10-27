@@ -3,36 +3,6 @@ import pandas as pd
 from datetime import datetime, date, time
 
 # %%--------------------------------------------------------------------------------------------------------------------
-st.header("***Data elements***")
-st.write("Use to display and interact with raw data.")
-
-# %%--------------------------------------------------------------------------------------------------------------------
-st.divider()
-st.subheader("***Data editor***")
-st.write("Edit dataframes and many other data structures in a table-like UI")
-
-code = """
-df = pd.DataFrame(
-    [
-       {"command": "st.selectbox", "rating": 4, "is_widget": True},
-       {"command": "st.balloons", "rating": 5, "is_widget": False},
-       {"command": "st.time_input", "rating": 3, "is_widget": True},
-   ]
-)
-
-# allow the user to add and delete rows by setting num_rows to "dynamic"
-edited_df = st.data_editor(df, num_rows="dynamic")
-
-favorite_command = edited_df.loc[edited_df["rating"].idxmax()]["command"]
-st.markdown(f"Your favorite command is **{favorite_command}** 🎈")
-"""
-
-st.code(code, language='python')
-
-exec(code)
-
-# %%--------------------------------------------------------------------------------------------------------------------
-st.divider()
 st.subheader("***Column configuration***")
 st.write("Configure the display and editing behavior of dataframes and data editors")
 st.write("The columns, from left to right, are ***text, number, checkbox, selectbox, and datetime***")
@@ -242,45 +212,3 @@ exec(code)
 expander = st.expander("Click to view code", expanded=False)
 with expander:
     st.code(code, language='python')
-
-
-# %%--------------------------------------------------------------------------------------------------------------------
-st.divider()
-st.subheader("***Metrics***")
-st.write("Display a metric in big bold font, with an optional indicator of how the metric changed.")
-
-
-code = """
-st.metric(label="Gas price", value=4, delta=-0.5,
-    delta_color="inverse")
-
-col1, col2, col3 = st.columns(3)
-col1.metric("Temperature", "70 °F", "1.2 °F")
-col2.metric("Wind", "9 mph", "-8%")
-col3.metric("Humidity", "86%", "4%")
-"""
-
-st.code(code, language='python')
-exec(code)
-
-
-# %%--------------------------------------------------------------------------------------------------------------------
-st.divider()
-st.subheader("***Dicts and JSON***")
-st.write("Display object or string as a pretty-printed JSON string.")
-
-code = """
-st.json({
-    'foo': 'bar',
-    'baz': 'boz',
-    'stuff': [
-        'stuff 1',
-        'stuff 2',
-        'stuff 3',
-        'stuff 5',
-    ],
-})
-"""
-
-st.code(code, language='python')
-exec(code)
