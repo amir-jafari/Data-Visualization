@@ -6,7 +6,7 @@
 
 This folder contained all the codes needed for data visualization.
 
-* Matlab_Vis
+* Streamlit App
 
 * Python_Vis
 
