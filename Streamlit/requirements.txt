@@ -5,6 +5,20 @@ numpy==1.26.1
 matplotlib==3.8.0
 scipy==1.11.3
 
+# For streamlit charts plot
 plotly==5.17.0
 altair==5.1.2
 vega_datasets==0.9.0
+
+scikit-learn==1.3.2
+
+# For NLP part
+nltk==3.8.1
+seaborn==0.13.0
+
+# For remove image background
+rembg==2.0.52
+
+transformers==4.35.0
+torch==2.1.0
+
