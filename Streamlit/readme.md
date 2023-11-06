@@ -16,14 +16,8 @@ powershell.exe -ExecutionPolicy ByPass -NoExit -Command "& conda activate <yourc
 
 ## Dependencies
 
-These are the packages needed to run all the demos. These specific versions are known to work, but this does not mean 
-older or newer versions will cause any issues.
+These are the packages needed to run all the demos. These specific versions from the **requirements.txt** are known to work, but this does not mean 
+older or newer versions will cause any issues. All the needed libraries can be installed by:
 
-- streamlit 1.28.0
-- pandas 2.1.1
-- numpy 1.26.1
-- matplotlib 3.8.0
-- plotly 5.17.0
-- altair 5.1.2
-- vega_datasets 0.9.0
-- scipy 1.11.3
+   `pip install -r requirements.txt`
+

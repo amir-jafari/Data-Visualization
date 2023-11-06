@@ -1,0 +1,22 @@
+import streamlit as st
+
+
+def get_txt():
+    txt = st.text_area(
+        "Text to analyze",
+        "I love you",
+    )
+
+    st.write(f'You wrote {len(txt)} characters.')
+    return txt
+
+
+def sidebar():
+    with st.sidebar:
+        genre = st.radio(
+            "Which model will you want to use?",
+            ["Hate-speech-CNERG/dehatebert-mono-english"],
+            # captions=["Use the pretrained model1 for image captioning."],
+            index=0,
+        )
+        return genre
