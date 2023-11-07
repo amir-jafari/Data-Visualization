@@ -36,7 +36,7 @@ def text_pre_processing(text, flg_stemm=False, flg_lemm=True, lst_stopwords=None
 def analyze_sentiment(text):
     # Create a TextBlob object
     testimonial = TextBlob(text)
-    print('testimonial', testimonial.sentiment)
+    # print('testimonial', testimonial.sentiment)
     # This will return a namedtuple of the form Sentiment(polarity, subjectivity)
     # Polarity is a float within the range [-1.0, 1.0]
     # Subjectivity is a float within the range [0.0, 1.0] where 0.0 is very objective and 1.0 is very subjective

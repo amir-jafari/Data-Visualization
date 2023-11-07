@@ -18,9 +18,14 @@ def main():
         st.divider()
         st.subheader("Step 3: Get the sentiment")
 
-        sentiment = utils.analyze_sentiment(txt)
+        result = utils.analyze_sentiment(txt)
+        print(result)
+        polarity = result.polarity
 
-        st.write(f"Sentiment of the text is: {sentiment}")
+        score = round(polarity, 2)
+        sentiment = 'neutral' if score == 0 else ('positive' if score > 0 else 'negative')
+
+        st.write(f"Sentiment of the text is: ***{sentiment}***, the socre is ***{score}***")
 
 if __name__ == "__main__":
     main()

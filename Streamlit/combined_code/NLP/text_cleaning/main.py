@@ -23,7 +23,8 @@ def main():
             st.divider()
             st.subheader(f"Step {step}: {item[1]}")
             txt = utils.clean(txt, item[0])
-            st.write(txt)
+            with st.expander("See result", expanded=True):
+                st.write(txt)
 
 
 if __name__ == "__main__":
