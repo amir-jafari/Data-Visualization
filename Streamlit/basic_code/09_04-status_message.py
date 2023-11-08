@@ -3,19 +3,16 @@ import streamlit as st
 st.subheader("***Message***")
 st.write("Display status messages.")
 
-code = """
-st.error('This is an error', icon="🚨")
 
-st.warning('This is a warning', icon="⚠️")
+# st.echo(): use in a with block to draw some code on the app, then execute it.
+with st.echo():
+    st.error('This is an error', icon="🚨")
 
-st.info('This is a purely informational message', icon="ℹ️")
+    st.warning('This is a warning', icon="⚠️")
 
-st.success('This is a success message!', icon="✅")
+    st.info('This is a purely informational message', icon="ℹ️")
 
-e = RuntimeError('This is an exception of type RuntimeError')
-st.exception(e)
-"""
+    st.success('This is a success message!', icon="✅")
 
-st.code(code, language='python')
-
-exec(code)
+    e = RuntimeError('This is an exception of type RuntimeError')
+    st.exception(e)

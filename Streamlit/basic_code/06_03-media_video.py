@@ -3,17 +3,15 @@ import os
 
 st.subheader("***Video***")
 
-code = """
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
-os.chdir('..')
 
-path = os.getcwd() + os.path.sep + 'static' + os.path.sep + 'myvideo.mp4'
+# st.echo(): use in a with block to draw some code on the app, then execute it.
+with st.echo():
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    os.chdir('..')
 
-video_file = open(path, 'rb')
-video_bytes = video_file.read()
+    path = os.getcwd() + os.path.sep + 'static' + os.path.sep + 'myvideo.mp4'
 
-st.video(video_bytes)
-"""
+    video_file = open(path, 'rb')
+    video_bytes = video_file.read()
 
-st.code(code, language='python')
-exec(code)
+    st.video(video_bytes)

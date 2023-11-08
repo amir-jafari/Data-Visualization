@@ -3,16 +3,14 @@ import numpy as np
 
 st.subheader("***Tabs***")
 
-code = """
-tab1, tab2 = st.tabs(["📈 Chart", "🗃 Data"])
-data = np.random.randn(10, 1)
 
-tab1.subheader("A tab with a chart")
-tab1.line_chart(data)
+# st.echo(): use in a with block to draw some code on the app, then execute it.
+with st.echo():
+    tab1, tab2 = st.tabs(["📈 Chart", "🗃 Data"])
+    data = np.random.randn(10, 1)
 
-tab2.subheader("A tab with the data")
-tab2.write(data)
-"""
+    tab1.subheader("A tab with a chart")
+    tab1.line_chart(data)
 
-st.code(code, language='python')
-exec(code)
+    tab2.subheader("A tab with the data")
+    tab2.write(data)

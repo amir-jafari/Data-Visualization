@@ -2,14 +2,12 @@ import streamlit as st
 
 st.subheader("***Multiselect***")
 
-code = '''
-options = st.multiselect(
-    'What are your favorite colors',
-    ['Green', 'Yellow', 'Red', 'Blue'],
-    ['Yellow', 'Red'])
 
-st.write('You selected:', options)
-'''
+# st.echo(): use in a with block to draw some code on the app, then execute it.
+with st.echo():
+    options = st.multiselect(
+        'What are your favorite colors',
+        ['Green', 'Yellow', 'Red', 'Blue'],
+        ['Yellow', 'Red'])
 
-st.code(code, language='python')
-exec(code)
+    st.write('You selected:', options)

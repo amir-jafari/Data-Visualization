@@ -7,23 +7,23 @@ import pandas as pd
 st.subheader("***Download button***")
 
 st.write("***Download an image***")
-code = '''
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
-os.chdir('..')
 
-path = os.getcwd() + os.path.sep + 'static' + os.path.sep + 'flower.png'
 
-with open(path, "rb") as file:
-    btn = st.download_button(
-            label="Download image",
-            data=file,
-            file_name="flower.png",
-            mime="image/png"
-          )
-'''
+# st.echo(): use in a with block to draw some code on the app, then execute it.
+with st.echo():
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    os.chdir('..')
 
-st.code(code, language='python')
-exec(code)
+    path = os.getcwd() + os.path.sep + 'static' + os.path.sep + 'flower.png'
+
+    with open(path, "rb") as file:
+        btn = st.download_button(
+                label="Download image",
+                data=file,
+                file_name="flower.png",
+                mime="image/png"
+              )
+
 
 st.write('#')
 st.write("***Download a large DataFrame as a CSV***")

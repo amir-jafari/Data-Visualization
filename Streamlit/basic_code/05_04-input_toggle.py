@@ -2,12 +2,10 @@ import streamlit as st
 
 st.subheader("***Toggle widget***")
 
-code = '''
-on = st.toggle('Activate feature')
 
-if on:
-    st.write('Feature activated!')
-'''
+# st.echo(): use in a with block to draw some code on the app, then execute it.
+with st.echo():
+    on = st.toggle('Activate feature')
 
-st.code(code, language='python')
-exec(code)
+    if on:
+        st.write('Feature activated!')

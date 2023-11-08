@@ -7,13 +7,11 @@ st.write("Inserts a container into your app that can be used to hold a single el
 
 st.write('***Overwriting elements in-place using "with" notation:***')
 
-code = """
-with st.empty():
-    for seconds in range(60):
-        st.write(f"⏳ {seconds} seconds have passed")
-        time.sleep(1)
-    st.write("✔️ 1 minute over!")
-"""
 
-st.code(code, language='python')
-exec(code)
+# st.echo(): use in a with block to draw some code on the app, then execute it.
+with st.echo():
+    with st.empty():
+        for seconds in range(60):
+            st.write(f"⏳ {seconds} seconds have passed")
+            time.sleep(1)
+        st.write("✔️ 1 minute over!")

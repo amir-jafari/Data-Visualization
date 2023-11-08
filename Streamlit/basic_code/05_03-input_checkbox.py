@@ -2,12 +2,9 @@ import streamlit as st
 
 st.subheader("***Checkbox***")
 
-code = '''
-agree = st.checkbox('I agree')
+# st.echo(): use in a with block to draw some code on the app, then execute it.
+with st.echo():
+    agree = st.checkbox('I agree')
 
-if agree:
-    st.write('Great!')
-'''
-
-st.code(code, language='python')
-exec(code)
+    if agree:
+        st.write('Great!')
