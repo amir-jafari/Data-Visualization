@@ -46,7 +46,7 @@ def get_text_label(df):
 def sidebar():
     with st.sidebar:
         genre = st.radio(
-            "Which model will you want to use?",
+            "Choose your model",
             ["Naive Bayes", "LogisticRegression"],
             captions=["Use Naive Bayes to predict.", "Use logistic regression to predict."],
             index=None,
