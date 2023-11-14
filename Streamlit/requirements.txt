@@ -33,3 +33,6 @@ ultralytics==8.0.207
 
 # Data augmentation
 albumentations==1.3.1
+
+# audio part
+librosa==0.10.1
