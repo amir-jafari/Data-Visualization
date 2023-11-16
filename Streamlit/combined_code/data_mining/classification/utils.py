@@ -1,33 +1,32 @@
-import re
 import streamlit as st
 import pandas as pd
-import nltk
 import seaborn as sns
 import matplotlib.pyplot as plt
 
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.linear_model import LogisticRegression
 
-def text_pre_processing(text, flg_stemm=False, flg_lemm=True, lst_stopwords=None):
-    text = re.sub(r'[^\w\s]', '', str(text).lower().strip())
-    lst_text = text.split()
-    if lst_stopwords is not None:
-        lst_text = [word for word in lst_text if word not in lst_stopwords]
-    if flg_stemm == True:
-        ps = nltk.stem.porter.PorterStemmer()
-        lst_text = [ps.stem(word) for word in lst_text]
-    if flg_lemm == True:
-        lem = nltk.stem.wordnet.WordNetLemmatizer()
-        lst_text = [lem.lemmatize(word) for word in lst_text]
-    text = " ".join(lst_text)
-    return text
+import warnings
+warnings.filterwarnings("ignore")
+
+
+def sidebar(options):
+    with st.sidebar:
+        genre = st.radio(
+            "Choose your model",
+            options,
+            index=None,
+        )
+        return genre
 
 
 def upload_file(file_name):
     file = st.file_uploader(f"Choose the {file_name}", type="csv")
-    no_header = st.checkbox("Check it if the dataset doesn't have the header row")
+    no_header = st.checkbox("Check it if the dataset doesn't have the header row", value=False)
 
     if file is not None:
         if no_header:
@@ -40,106 +39,119 @@ def upload_file(file_name):
         return df
 
 
-def get_text_label(df):
-    options = st.multiselect(
-        'Sequentially select the text and label columns',
-        df.columns.tolist(),
-        [])
+def decision_tree_predict(X_train, y_train):
+    criterion = st.radio(
+        "Choose your criterion",
+        ['gini', 'entropy'],
+    )
+    max_depth = st.number_input("Type the max_depth", value=3, min_value=1, max_value=20, step=1,
+                                placeholder="Type a int number...")
+    min_samples_leaf = st.number_input("Type the min_samples_leaf", value=5, min_value=0, max_value=20,
+                                       placeholder="Type a number...")
 
-    if len(options) == 2:
-        st.write(f'Your text column is {options[0]}, and you label column is  {options[1]}')
-        return options
+    if not max_depth or not min_samples_leaf:
+        st.stop()
 
-    st.warning("You should pick up two columns")
+    clf = DecisionTreeClassifier(criterion=criterion, random_state=100, max_depth=max_depth,
+                                 min_samples_leaf=min_samples_leaf)
+    clf.fit(X_train, y_train)
+    return clf
 
 
-def desicion_tree_predict(X_train, y_train, X_test, criterion):
-    # perform training with giniIndex.
-    # creating the classifier object
-    clf = DecisionTreeClassifier(criterion=criterion, random_state=100, max_depth=3, min_samples_leaf=5)
+def random_forest_predict(X_train, y_train, X_test, columns):
+    n_estimators = st.number_input("Type the n_estimators", value=100, min_value=1, max_value=10000, step=1,
+                                   placeholder="Type a int number...")
+    if not n_estimators:
+        st.stop()
 
-    # performing training
+    clf = RandomForestClassifier(n_estimators=n_estimators, random_state=100)
     clf.fit(X_train, y_train)
 
-    # predicton on test using gini
-    y_pred = clf.predict(X_test)
-    return y_pred
-
-def random_forest_predict(X_train, y_train, X_test, columns, k_features=None):
-    # specify random forest classifier
-    clf = RandomForestClassifier(n_estimators=100)
-    clf.fit(X_train, y_train)
-
-    # get feature importances
     importances = clf.feature_importances_
-
     # convert the importances into one-dimensional 1darray with corresponding df column names as axis labels
     f_importances = pd.Series(importances, columns)
 
     # sort the array in descending order of the importances
     f_importances.sort_values(ascending=False, inplace=True)
 
-    # make the bar Plot from f_importances
-    f_importances.plot(x='Features', y='Importance', kind='bar', figsize=(16, 9), rot=90, fontsize=15)
-
-    # show the plot
-    plt.tight_layout()
+    st.write('Plot feature importances in descending order')
+    f_importances.plot(x='Features', y='Importance', kind='bar')
     st.pyplot(plt)
 
-    if k_features:
-        # select features to perform training with random forest with k columns
+    if st.toggle('Use K features to do predict'):
+        f_importances_lst = f_importances.index.tolist()
+
+        end_feature = st.select_slider(
+            'Select a range of features to use to predict',
+            options=f_importances_lst,
+            value=(f_importances_lst[-1]))
+        st.write('You selected features between', f_importances_lst[0], 'and', end_feature)
+
+        end_index = f_importances_lst.index(end_feature) + 1
+
         # select the training dataset on k-features
-        newX_train = X_train[:, clf.feature_importances_.argsort()[::-1][:15]]
+        newX_train = X_train[:, clf.feature_importances_.argsort()[::-1][:end_index]]
 
         # select the testing dataset on k-features
-        newX_test = X_test[:, clf.feature_importances_.argsort()[::-1][:15]]
+        newX_test = X_test[:, clf.feature_importances_.argsort()[::-1][:end_index]]
 
-        # specify random forest classifier
-        clf_k_features = RandomForestClassifier(n_estimators=100)
-
-        # train the model
+        clf_k_features = RandomForestClassifier(n_estimators=n_estimators, random_state=100)
         clf_k_features.fit(newX_train, y_train)
 
-        # prediction on test using k features
-        y_pred = clf_k_features.predict(newX_test)
-        y_pred_score = clf_k_features.predict_proba(newX_test)
+        return clf_k_features, newX_test
+
+    return clf, X_test
+
+
+def SVM_predict(X_train, y_train):
+    kernel = st.radio(
+        "Choose your kernel",
+        ['linear', 'rbf'],
+    )
+    C_value = st.number_input("Type the C value", value=1.0, min_value=0.0, max_value=100.0, step=0.1,
+                              placeholder="Type a number...")
+
+    if kernel == 'linear':
+        svm = SVC(kernel='linear', C=C_value, random_state=0)
     else:
-        # predicton on test using all features
-        y_pred = clf.predict(X_test)
-        y_pred_score = clf.predict_proba(X_test)
+        gamma = st.number_input("Type the gamma value", value=0.2, min_value=0.0, max_value=100.0, step=0.1,
+                                placeholder="Type a number...")
 
-    # # st.write(f"y_pred_score is {y_pred_score}")
-    # print("ROC_AUC : ", roc_auc_score(y_test, y_pred_score[:, 1]) * 100)
-
-    return y_pred
-
-
-def SVM_predict(X_train, y_train, X_test, linear=True):
-    sc = StandardScaler()
-    sc.fit(X_train)
-    X_train_std = sc.transform(X_train)
-    X_test_std = sc.transform(X_test)
-
-    if linear:
-        svm = SVC(kernel='linear', C=1.0, random_state=0)
-    else:
-        svm = SVC(kernel='rbf', random_state=0, gamma=0.2, C=1.0)
+        svm = SVC(kernel='rbf', random_state=0, gamma=gamma, C=C_value)
 
     svm.fit(X_train, y_train)
 
-    y_pred = svm.predict(X_test)
-    return y_pred
+    return svm
 
 
-def sidebar(options):
-    with st.sidebar:
-        genre = st.radio(
-            "Choose your model",
-            options,
-            # captions=["Use Naive Bayes to predict.", "Use logistic regression to predict."],
-            index=None,
-        )
-        return genre
+def KNN_predict(X_train, y_train):
+    metric = st.radio(
+        "Choose your metric",
+        ['minkowski'],
+    )
+    n_neighbors = st.number_input("Type the n_neighbors", value=1, min_value=1, max_value=10000, step=1,
+                                  placeholder="Type a int number...")
+    p_value = st.number_input("Type the p value", value=2, min_value=1, max_value=10000, step=1,
+                              placeholder="Type a int number...")
+
+    knn = KNeighborsClassifier(n_neighbors=n_neighbors, p=p_value, metric=metric)
+    knn.fit(X_train, y_train)
+    return knn
+
+
+def NB_predict(X_train, y_train):
+    clf = GaussianNB()
+    clf.fit(X_train, y_train)
+    return clf
+
+
+def Logistic_predict(X_train, y_train):
+    C_value = st.number_input("Type the C value", value=1000.0, min_value=1.0, max_value=100000.0, step=0.1,
+                              placeholder="Type a number...")
+
+    lr = LogisticRegression(C=C_value, random_state=0)
+    lr.fit(X_train, y_train)
+    return lr
 
 
 def draw(cm):
@@ -147,13 +159,3 @@ def draw(cm):
     plt.xlabel('Predicted')
     plt.ylabel('Actual')
     st.pyplot(plt)
-
-
-def download_file(df, model_name):
-    st.write(f"Download The {model_name} result")
-    st.download_button(
-        label="Download DataFrame as CSV",
-        data=df.to_csv(index=False),
-        file_name="Test_predict.csv",
-        mime="text/csv"
-    )

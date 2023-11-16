@@ -1,33 +1,23 @@
-import time
-
 import streamlit as st
+import pandas as pd
 
-from sklearn import feature_extraction,  naive_bayes, pipeline
-from sklearn.metrics import classification_report, confusion_matrix, f1_score
-from sklearn.linear_model import LogisticRegression
-
-
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score
-from sklearn.naive_bayes import GaussianNB
 
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
+import warnings
+warnings.filterwarnings("ignore")
 
 import utils
 
 
 def main():
-    st.header("Classification")
-    st.divider()
-    st.subheader("Step 1: File uploader")
+    # Save the state of clicking button for the step 2
+    if 'button_clicked' not in st.session_state:
+        st.session_state.button_clicked = False
 
     options_dic = {
-        "Decision Tree (gini)": 0,
-        "Decision Tree (entropy)": 1,
+        "Decision Tree": 1,
         "Random Forest": 2,
         "Support Vector Machine": 3,
         "KNN": 4,
@@ -36,13 +26,71 @@ def main():
     }
     model_name = utils.sidebar(options_dic.keys())
 
+    st.header("Classification")
+    st.divider()
+    st.subheader("Step 1: File uploader")
+
     data = utils.upload_file("CSV data file")
 
     if data is None:
         st.stop()
 
     st.divider()
-    st.subheader("Step 2: Pick up the model from the left side bar")
+    st.subheader("Step 2: Data preprocessing")
+
+    y_column = st.selectbox(
+        'Select the y column',
+        data.columns,
+
+    )
+
+    dropped_columns = st.multiselect(
+        'Drop the unnnecessary columns',
+        [col for col in data.columns if col != y_column],
+        []
+    )
+
+    if st.button('Confirm choosing', type="primary"):
+        st.session_state.button_clicked = True
+
+    if st.session_state.button_clicked is False:
+        st.stop()
+
+    data.drop(dropped_columns, axis=1, inplace=True)
+
+    st.write("Display the count of null values for columns with more than 0 nulls.")
+    null_counts = data.isnull().sum()
+    st.write(null_counts[null_counts > 0])
+
+    if st.toggle('Drop rows with NA values (needed for all models except Decision Tree)'):
+        data = data.dropna(axis=0)
+
+    encoding_columns = st.multiselect(
+        'Choose the columns that need encoding',
+        [col for col in data.columns if (col != y_column and col not in dropped_columns)],
+        []
+    )
+
+    # encoding the class with sklearn's LabelEncoder
+    class_le = LabelEncoder()
+
+    for col in encoding_columns:
+        data[col] = class_le.fit_transform(data[col])
+
+    st.write(f'The y column of the dataframe is {y_column}, and the modified dataframe looks as follow:')
+    st.write(data.head())
+
+    y = data[y_column].values
+    X = data.drop(y_column, axis=1).values
+
+    # fit and transform the class
+    y = class_le.fit_transform(y)
+
+    # split the dataset into train and test
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=100)
+
+    st.divider()
+    st.subheader("Step 3: Pick up the model from the left side bar")
 
     if not model_name:
         st.stop()
@@ -52,97 +100,42 @@ def main():
     st.write(f"The model you choose is {model_name}")
 
     st.divider()
-    st.subheader("Step 3: Data preprocessing")
+    st.subheader("Step 4: Set up model parameters")
 
-    y_column = st.selectbox(
-        'Select the y column',
-        data.columns,
-    )
-
-    dropped_columns = st.multiselect(
-        'Drop the unnnecessary columns',
-        data.columns,
-        []
-    )
-
-    if y_column in dropped_columns:
-        st.error("You can not drop the y column")
-        st.stop()
-
-    if not st.button('Confirm choosing', type="primary"):
-        st.stop()
-
-    data.drop(dropped_columns, axis=1, inplace=True)
-
-    st.write(f'The y column of the dataframe is {y_column}, and the modified dataframe looks as follow:')
-    st.write(data.head())
-
-    y = data[y_column].values
-    X = data.drop(y_column, axis=1).values
-
-    # encloding the class with sklearn's LabelEncoder
-    class_le = LabelEncoder()
-
-    # fit and transform the class
-    y = class_le.fit_transform(y)
-
-    # split the dataset into train and test
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=100)
-
-    st.divider()
-    st.subheader("Step 4: Get the result")
-
-    if index == 0:
-        y_pred = utils.desicion_tree_predict(X_train, y_train, X_test, "gini")
-    elif index == 1:
-        y_pred = utils.desicion_tree_predict(X_train, y_train, X_test, "entropy")
+    if index == 1:
+        clf = utils.decision_tree_predict(X_train, y_train)
     elif index == 2:
         columns = data.drop(y_column, axis=1).columns
-        y_pred = utils.random_forest_predict(X_train, y_train, X_test, columns)
+        clf, X_test = utils.random_forest_predict(X_train, y_train, X_test, columns)
     elif index == 3:
-        y_pred = utils.SVM_predict(X_train, y_train, X_test, linear=True)
+        clf = utils.SVM_predict(X_train, y_train)
     elif index == 4:
-        from sklearn.neighbors import KNeighborsClassifier
-        knn = KNeighborsClassifier(n_neighbors=1, p=2, metric='minkowski')
-        knn.fit(X_train, y_train)
-        y_pred = knn.predict(X_test)
+        clf = utils.KNN_predict(X_train, y_train)
     elif index == 5:
-        clf = GaussianNB()
-        clf.fit(X_train, y_train)
-        y_pred = clf.predict(X_test)
+        clf = utils.NB_predict(X_train, y_train)
     elif index == 6:
-        lr = LogisticRegression(C=1000.0, random_state=0)
-        lr.fit(X_train, y_train)
-        y_pred = lr.predict(X_test)
+        clf = utils.Logistic_predict(X_train, y_train)
     else:
         st.error("The index does not exist")
         st.stop()
 
-    class_names = data[y_column].unique()
+    st.divider()
+    st.subheader("Step 5: Get the result")
+
+    y_pred = clf.predict(X_test)
 
     accuracy = accuracy_score(y_test, y_pred) * 100
     st.write(f"The accuracy of {index}. {model_name} model is : {accuracy:.2f} %")
 
-    # st.write("**Classification Report:**")
     st.text('Classification Report:\n' + classification_report(y_test, y_pred))
 
     conf_matrix = confusion_matrix(y_test, y_pred)
 
-    st.write('The class_names are', ', '.join(class_names))
-
+    # st.write(type(conf_matrix))
+    class_names = data[y_column].unique()
     df_cm = pd.DataFrame(conf_matrix, index=class_names, columns=class_names)
 
-    # plt.figure(figsize=(5, 5))
-    # hm = sns.heatmap(df_cm, cbar=False, annot=True, square=True, fmt='d', annot_kws={'size': 20},
-    #                  yticklabels=df_cm.columns, xticklabels=df_cm.columns)
-    # hm.yaxis.set_ticklabels(hm.yaxis.get_ticklabels(), rotation=0, ha='right', fontsize=20)
-    # hm.xaxis.set_ticklabels(hm.xaxis.get_ticklabels(), rotation=0, ha='right', fontsize=20)
-    # plt.ylabel('True label', fontsize=20)
-    # plt.xlabel('Predicted label', fontsize=20)
-    # plt.tight_layout()
-    # st.pyplot(plt)
-
-    utils.draw(conf_matrix)
+    utils.draw(df_cm)
 
 
 if __name__ == "__main__":
