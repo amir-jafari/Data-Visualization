@@ -1,5 +1,8 @@
+import io
 import streamlit as st
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 from sklearn.preprocessing import LabelEncoder
@@ -90,17 +93,62 @@ def main():
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=100)
 
     st.divider()
-    st.subheader("Step 3: Pick up the model from the left side bar")
+    st.subheader("Step 3: EDA")
 
+    tab1, tab2 = st.tabs(["data.describe()", "data.info()"])
+    with tab1:
+        st.write('***data.describe():***', data.describe())
+
+    with tab2:
+        st.write('***data.info():***')
+        buffer = io.StringIO()
+        data.info(buf=buffer)
+        st.text(buffer.getvalue())
+
+    st.write("***Plot for each column***")
+    columns = data.columns.tolist()
+    tabs = st.tabs(columns)
+
+    for i in range(len(columns)):
+        with tabs[i]:
+            plot_column = columns[i]
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                # Boxplot for a numerical column
+                plt.figure()
+                sns.boxplot(x=data[plot_column])
+                plt.title('Boxplot of numerical_column')
+                st.pyplot(plt)
+
+                # # Histogram for a numerical column
+                # plt.figure(figsize=(8, 6))
+                # sns.histplot(data[plot_column], kde=True)
+                # plt.title('Distribution of numerical_column')
+                # plt.xlabel('Value')
+                # plt.ylabel('Frequency')
+                # st.pyplot(plt)
+
+            with col2:
+                # Bar chart for a categorical column
+                plt.figure()
+                sns.countplot(x=data[plot_column])
+                plt.title('Count of categorical_column')
+                plt.xlabel('Category')
+                plt.ylabel('Count')
+                st.pyplot(plt)
+
+
+    st.divider()
+    st.subheader("Step 4: Choose model and set up parameters")
     if not model_name:
+        st.warning("***Pick up the model from the left side bar***")
         st.stop()
 
     index = options_dic[model_name]
 
-    st.write(f"The model you choose is {model_name}")
-
-    st.divider()
-    st.subheader("Step 4: Set up model parameters")
+    st.write(f"The model you choose is ***{model_name}***")
 
     if index == 1:
         clf = utils.decision_tree_predict(X_train, y_train)

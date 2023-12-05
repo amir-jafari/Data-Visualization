@@ -11,65 +11,61 @@ import utils
 
 def main():
     st.header("Audio Processing")
-    st.divider()
-    st.subheader("Step 1: Audio File Upload and Play")
 
-    audio_process_lst = ['Display', 'Feature extraction', 'Spectrogram decomposition', 'Temporal segmentation']
-    process_name = utils.sidebar(audio_process_lst)
+    audio_process_lst = ['File Upload', 'Display', 'Feature extraction', 'Spectrogram decomposition', 'Temporal segmentation']
+    # process_name = utils.sidebar(audio_process_lst)
 
-    uploaded_file = st.file_uploader("Choose an audio file", type=['mp3', 'wav', 'ogg', 'flac'])
+    tab0, tab1, tab2, tab3, tab4 = st.tabs(audio_process_lst)
 
-    if not uploaded_file:
-        st.stop()
+    with tab0:
 
-    y, sr = librosa.load(uploaded_file, mono=False)
-    y_stereo = None
-    is_stereo = False
+        uploaded_file = st.file_uploader("***Choose an audio file***", type=['mp3', 'wav', 'ogg', 'flac'])
 
-    if y.ndim == 2: # means it's stereo instead of mono
-        # Convert stereo to mono by averaging the channels
-        y_stereo = y.copy()
-        y = np.mean(y, axis=0)
-        is_stereo = True
+        if not uploaded_file:
+            st.stop()
 
-    # print(f'y_stereo.shape {y_stereo.shape if is_stereo else y_stereo} y.shape {y.shape}, sr {sr}')
+        y, sr = librosa.load(uploaded_file, mono=False)
+        y_stereo = None
+        is_stereo = False
 
-    st.audio(y, format='audio/ogg', sample_rate=sr)
+        if y.ndim == 2: # means it's stereo instead of mono
+            # Convert stereo to mono by averaging the channels
+            y_stereo = y.copy()
+            y = np.mean(y, axis=0)
+            is_stereo = True
 
-    duration = math.ceil(len(y) / sr)
-
-    st.write(
-        f"The total length of the audio file is: ***{duration} seconds***. "
-        f"And It's ***{'stereo' if is_stereo else 'mono'}*** audio file"
-    )
-
-    if st.toggle('Choose a part (a duration) of the audio file to analyze'):
-        start_time, end_time = 0, duration
-
-        values = st.slider(
-            'Select a duration (second) of the audio file',
-            start_time, end_time, (start_time, end_time))
-
-        # Convert time to samples
-        start_sample = int(values[0] * sr)
-        end_sample = int(values[1] * sr)
-
-        # Extract the part of the audio file
-        y = y[start_sample:end_sample]
-        if is_stereo:
-            y_stereo = y_stereo[:, start_sample:end_sample]
+        # print(f'y_stereo.shape {y_stereo.shape if is_stereo else y_stereo} y.shape {y.shape}, sr {sr}')
 
         st.audio(y, format='audio/ogg', sample_rate=sr)
 
-    # print(f'y_stereo.shape {y_stereo.shape if is_stereo else y_stereo} y.shape {y.shape}, sr {sr}')
+        duration = math.ceil(len(y) / sr)
 
-    st.divider()
-    st.subheader("Step 2: Choose a processing method from left side bar")
+        st.write(
+            f"The total length of the audio file is: ***{duration} seconds***. "
+            f"And It's ***{'stereo' if is_stereo else 'mono'}*** audio file"
+        )
 
-    if not process_name:
-        st.stop()
+        if st.toggle('Choose a part (a duration) of the audio file to analyze'):
+            start_time, end_time = 0, duration
 
-    if process_name == audio_process_lst[0]:
+            values = st.slider(
+                'Select a duration (second) of the audio file',
+                start_time, end_time, (start_time, end_time))
+
+            # Convert time to samples
+            start_sample = int(values[0] * sr)
+            end_sample = int(values[1] * sr)
+
+            # Extract the part of the audio file
+            y = y[start_sample:end_sample]
+            if is_stereo:
+                y_stereo = y_stereo[:, start_sample:end_sample]
+
+            st.audio(y, format='audio/ogg', sample_rate=sr)
+
+        # print(f'y_stereo.shape {y_stereo.shape if is_stereo else y_stereo} y.shape {y.shape}, sr {sr}')
+
+    with tab1:
         st.write('***Visualize an STFT power spectrum***')
 
         fig, ax = plt.subplots(nrows=2, ncols=1, sharex=True)
@@ -131,8 +127,7 @@ def main():
         ax['h'].set(title='transpose=True')
         st.pyplot(fig3)
 
-    elif process_name == audio_process_lst[1]:
-
+    with tab2:
         st.write('***Compute a chromagram from a power spectrogram***')
 
         S = np.abs(librosa.stft(y, n_fft=4096)) ** 2
@@ -147,7 +142,7 @@ def main():
         fig1_0.colorbar(img, ax=[ax[1]])
         st.pyplot(fig1_0)
 
-    elif process_name == audio_process_lst[2]:
+    with tab3:
         st.write('***Decompose a magnitude spectrogram into 16 components with NMF***')
 
         S = np.abs(librosa.stft(y))
@@ -181,7 +176,7 @@ def main():
         fig2_1.colorbar(img, ax=list(ax.values()), format="%+2.f dB")
         st.pyplot(fig2_1)
 
-    elif process_name == audio_process_lst[3]:
+    with tab4:
         st.write('***Cluster by chroma similarity, break into 20 segments***')
 
         chroma = librosa.feature.chroma_cqt(y=y, sr=sr)

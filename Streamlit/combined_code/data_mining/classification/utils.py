@@ -40,13 +40,19 @@ def upload_file(file_name):
 
 
 def decision_tree_predict(X_train, y_train):
-    criterion = st.radio(
-        "Choose your criterion",
-        ['gini', 'entropy'],
-    )
-    max_depth = st.number_input("Type the max_depth", value=3, min_value=1, max_value=20, step=1,
+    tab1, tab2, tab3 = st.tabs(["criterion", "max_depth", "min_samples_leaf"])
+    with tab1:
+        criterion = st.radio(
+            "Choose your criterion",
+            ['gini', 'entropy'],
+        )
+
+    with tab2:
+        max_depth = st.number_input("Type the max_depth", value=3, min_value=1, max_value=20, step=1,
                                 placeholder="Type a int number...")
-    min_samples_leaf = st.number_input("Type the min_samples_leaf", value=5, min_value=0, max_value=20,
+
+    with tab3:
+        min_samples_leaf = st.number_input("Type the min_samples_leaf", value=5, min_value=0, max_value=20,
                                        placeholder="Type a number...")
 
     if not max_depth or not min_samples_leaf:
@@ -104,12 +110,17 @@ def random_forest_predict(X_train, y_train, X_test, columns):
 
 
 def SVM_predict(X_train, y_train):
-    kernel = st.radio(
-        "Choose your kernel",
-        ['linear', 'rbf'],
-    )
-    C_value = st.number_input("Type the C value", value=1.0, min_value=0.0, max_value=100.0, step=0.1,
-                              placeholder="Type a number...")
+    tab1, tab2 = st.tabs(["kernel", "C value"])
+
+    with tab1:
+        kernel = st.radio(
+            "Choose your kernel",
+            ['linear', 'rbf'],
+        )
+
+    with tab2:
+        C_value = st.number_input("Type the C value", value=1.0, min_value=0.0, max_value=100.0, step=0.1,
+                                  placeholder="Type a number...")
 
     if kernel == 'linear':
         svm = SVC(kernel='linear', C=C_value, random_state=0)
@@ -125,13 +136,20 @@ def SVM_predict(X_train, y_train):
 
 
 def KNN_predict(X_train, y_train):
-    metric = st.radio(
-        "Choose your metric",
-        ['minkowski'],
-    )
-    n_neighbors = st.number_input("Type the n_neighbors", value=1, min_value=1, max_value=10000, step=1,
+    tab1, tab2, tab3 = st.tabs(["metric", "n_neighbors", "p value"])
+
+    with tab1:
+        metric = st.radio(
+            "Choose your metric",
+            ['minkowski'],
+        )
+
+    with tab2:
+        n_neighbors = st.number_input("Type the n_neighbors", value=1, min_value=1, max_value=10000, step=1,
                                   placeholder="Type a int number...")
-    p_value = st.number_input("Type the p value", value=2, min_value=1, max_value=10000, step=1,
+
+    with tab3:
+        p_value = st.number_input("Type the p value", value=2, min_value=1, max_value=10000, step=1,
                               placeholder="Type a int number...")
 
     knn = KNeighborsClassifier(n_neighbors=n_neighbors, p=p_value, metric=metric)
