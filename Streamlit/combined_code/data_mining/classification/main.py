@@ -42,9 +42,8 @@ def main():
     st.subheader("Step 2: Data preprocessing")
 
     y_column = st.selectbox(
-        'Select the y column',
+        'Select the y label column',
         data.columns,
-
     )
 
     dropped_columns = st.multiselect(

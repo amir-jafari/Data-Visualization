@@ -36,3 +36,6 @@ albumentations==1.3.1
 
 # audio part
 librosa==0.10.1
+
+# linear regression
+statsmodels==0.14.0

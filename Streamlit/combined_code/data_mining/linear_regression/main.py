@@ -1,6 +1,5 @@
 import streamlit as st
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 
 from sklearn.model_selection import train_test_split
@@ -27,21 +26,21 @@ def main():
         with col2:
             mean = st.slider('The mean of x', -50, 50, 5)
         with col3:
-            std = st.slider('The STD of x', -20, 20, 2)
+            std = st.slider('The STD of x', 0, 50, 2)
 
         x = np.random.normal(mean, std, size)
     elif distribution == "Uniform Distribution":
         with col2:
-            low = st.slider('The lower boundary', -50, 50, 0)
+            low = st.slider('The lower boundary', -100, 100, -10)
         with col3:
-            high = st.slider('The upper boundary', 0, 100, 10)
+            high = st.slider('The upper boundary', -100, 100, 10)
 
         x = np.random.uniform(low, high, size)  # uniform_distribution
     else:
         with col2:
-            shape = st.slider('k parameter', -50, 50, 2)
+            shape = st.slider('k parameter', 0, 50, 2)
         with col3:
-            scale = st.slider('θ parameter', -20, 20, 1)
+            scale = st.slider('θ parameter', 0, 50, 1)
 
         x = np.random.gamma(shape, scale, size) # gamma_distribution
 
@@ -70,19 +69,22 @@ def main():
     st.divider()
     st.subheader("Step 2: Get the result")
 
-    X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=1)
+    test_size = 0.2
+
+    X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=test_size, random_state=1)
     reg = LinearRegression().fit(X_train, y_train)
 
-    st.write(f'The slope is  {round(reg.coef_[0][0], 2)}, and the intercept is {round(reg.intercept_[0], 2)}')
+    st.write(f'The train-test split ratio is set to {test_size*100:.1f}%')
+    st.write(f'For train dataset, The ***slope*** is  {round(reg.coef_[0][0], 2)}, and the ***intercept*** is {round(reg.intercept_[0], 2)}')
 
     pred = reg.predict(X_test)
     MSE = mean_squared_error(pred, y_test)
-    st.write(f'Mean Squared Error (MSE): {MSE:.2f}, reg.score(X_train, y_train): {reg.score(X_train, y_train):.2f}')
+    st.write(f'For test dataset, ***Mean Squared Error (MSE)*** is: {MSE:.2f}, ***reg.score(X_train, y_train)*** is: {reg.score(X_train, y_train):.2f}')
 
     # Fit the regression model on training data
     model = sm.OLS(y_train, sm.add_constant(X_train)).fit()
 
-    st.write('The summary of the regression model:')
+    st.write('The summary of the regression model based on train dataset:')
     st.write(model.summary())
 
     st.divider()
