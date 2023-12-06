@@ -15,7 +15,8 @@ def main():
 
     distribution = st.radio(
         "Choose the distribution of X",
-        ["Normal Distribution", "Uniform Distribution", "Gamma Distribution"]
+        ["Normal Distribution", "Uniform Distribution", "Gamma Distribution"],
+        index=1,
     )
 
     col1, col2, col3 = st.columns(3)
@@ -54,14 +55,34 @@ def main():
 
     st.write('##')
     st.write('***Change slope and intercept to generate Y data***')
-    col4, col5 = st.columns(2)
+    col4, col5, col6 = st.columns(3)
 
     with col4:
         slope = st.slider('The slope between x and y', -20, 20, 2)
     with col5:
         intercept = st.slider('The intercept between x and y', -50, 50, 0)
+    with col6:
+        error_std = st.slider('The STD of the error term', 0, 20, 2)
 
-    y = slope * x + intercept  # Add a linear relationship
+    error = np.random.normal(0, error_std, size)
+    y = slope * x + intercept + error  # Add a linear relationship
+
+    col7, col8 = st.columns(2)
+
+    with col7:
+        fig2, ax2 = plt.subplots()
+        ax2.scatter(x, y, c='b', marker='.')
+        ax2.set_xlabel('X')
+        ax2.set_ylabel('Y')
+        ax2.set_title('X and Y dataset')
+        st.pyplot(fig2)
+    with col8:
+        fig, ax = plt.subplots()
+        ax.hist(error, bins=30, alpha=0.7, color='blue')
+        ax.set_title(f'Histogram of error term')
+        ax.set_xlabel('Value')
+        ax.set_ylabel('Frequency')
+        st.pyplot(fig)
 
     x = x.reshape(-1, 1)
     y = y.reshape(-1, 1)
@@ -77,8 +98,8 @@ def main():
     st.write(f'The train-test split ratio is set to {test_size*100:.1f}%')
     st.write(f'For train dataset, The ***slope*** is  {round(reg.coef_[0][0], 2)}, and the ***intercept*** is {round(reg.intercept_[0], 2)}')
 
-    pred = reg.predict(X_test)
-    MSE = mean_squared_error(pred, y_test)
+    y_pred = reg.predict(X_test)
+    MSE = mean_squared_error(y_pred, y_test)
     st.write(f'For test dataset, ***Mean Squared Error (MSE)*** is: {MSE:.2f}, ***reg.score(X_train, y_train)*** is: {reg.score(X_train, y_train):.2f}')
 
     # Fit the regression model on training data
@@ -91,12 +112,23 @@ def main():
     st.subheader("Step 3: Plot the results")
 
     fig2, ax2 = plt.subplots()
-    ax2.scatter(x, y, c='r', marker='.', label='Data')
-    # ax2.scatter(X_train, y_train, c='b', marker='o', label='Train')
-    ax2.plot(X_test, pred, c='g', marker='x', label='Prediction')
+    ax2.scatter(X_train, y_train, c='r', marker='.', label='Train')
+    ax2.plot(X_test, y_pred, c='g', marker='x', label='Prediction')
     ax2.legend(loc='lower right')
+    ax2.set_xlabel('X')
+    ax2.set_ylabel('Y')
     ax2.set_title('Regression')
     st.pyplot(fig2)
+
+    residuals = y_test - y_pred
+
+    fig3, ax3 = plt.subplots()
+    ax3.scatter(X_test, residuals)
+    ax3.hlines(y=0, xmin=X_test.min(), xmax=X_test.max(), linestyles='dashed')
+    ax3.set_xlabel('X')
+    ax3.set_ylabel('Residuals')
+    ax3.set_title('Error Residuals between test Y and predicted Y')
+    st.pyplot(fig3)
 
 
 if __name__ == "__main__":
