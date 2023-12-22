@@ -21,7 +21,7 @@ textblob==0.17.1
 rembg==2.0.52
 pooch==1.8.0
 
-transformers==4.35.0
+transformers==4.36.2
 torch==2.1.0
 
 keras==2.14.0
@@ -39,3 +39,6 @@ librosa==0.10.1
 
 # linear regression
 statsmodels==0.14.0
+
+# time series
+tqdm==4.66.1

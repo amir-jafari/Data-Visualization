@@ -97,20 +97,35 @@ def main():
 
     period = st.slider('Choose the period of seasonal_decompose', 1, 500, 365)
     with st.expander("See the instructions of **period** choosing"):
-        st.write(
+        st.markdown(
             '''
-            If your data has yearly observations and shows annual seasonality, set period=1. \n
-            For data with quarterly observations, period=4 (since there are 4 quarters in a year). \n
-            For monthly data, period=12 is common, as there are 12 months in a year. \n
-            Use period=52 for weekly data, considering there are approximately 52 weeks in a year. \n
-            If the data exhibits weekly seasonality, period=7 (7 days in a week). \n
-            For daily data with annual seasonality (like daily temperatures over several years), period=365 (or 366 for leap years). \n
-            If you have hourly data with a daily cycle, period=24. \n
-            For hourly data with a weekly cycle, period=24*7.
-            '''
+            **Annual Data (Yearly Cycle):**
+            - For yearly observations showing annual seasonality, set `period=1`.
+    
+            **Quarterly Data:**
+            - For quarterly observations, use `period=4` (4 quarters in a year).
+    
+            **Monthly Data:**
+            - Commonly, `period=12` for monthly data (12 months in a year).
+    
+            **Weekly Data:**
+            - For weekly data, `period=52` is suitable (around 52 weeks in a year).
+    
+            **Daily Data:**
+            - With weekly seasonality in daily data, use `period=7` (7 days in a week).
+            - For annual seasonality in daily data, `period=365` (or `366` for leap years).
+    
+            **Hourly Data:**
+            - `period=24` for daily cycles in hourly data.
+            - `period=24*7` for weekly cycles.
+    
+            **Custom Period:**
+            - The period can be any integer representing the seasonal cycle. For example, for 10-minute intervals with a daily pattern, `period=24*6` (144 intervals per day).
+            ''',
+            unsafe_allow_html=True
         )
 
-    plt.figure(num=None, figsize=(50, 20), dpi=80, facecolor='w', edgecolor='k')
+    # plt.figure(num=None, figsize=(50, 20), dpi=80, facecolor='w', edgecolor='k')
     series = data[X_column]
 
     # st.write(series)
@@ -131,6 +146,8 @@ def main():
     st.divider()
     st.subheader("Step 3: Methods for time series forecasting")
 
+    radio = st.slider('Choose the radio of the train test split', 0.10, 0.50, 0.25)
+
     if not model_name:
         st.warning("***Pick up the model from the left side bar***")
         st.stop()
@@ -138,9 +155,7 @@ def main():
     resultsDict = {}
     predictionsDict = {}
 
-    radio = 0.2
     index = int((1-radio) * len(X))
-
     model_index = options_dic[model_name]
 
     if model_index == 1:
