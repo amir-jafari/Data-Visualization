@@ -7,6 +7,15 @@
 ```
 powershell.exe -ExecutionPolicy ByPass -NoExit -Command "& conda activate <yourcondaenvname>
 ```
+
+## Debug Streamlit
+1. For pycharm go to edit environment
+2. Change script to module
+3. Add streamlit.web.cli
+4. run the name of your file.py
+
+![Debug](debug.png)
+
 ***
 ## Run code
 1. Install the dependencies from requirements.txt
