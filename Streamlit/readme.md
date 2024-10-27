@@ -30,7 +30,7 @@ older or newer versions will cause any issues. All the needed libraries can be i
 
    `pip install -r requirements.txt`
 
-## Run StCommand Port number
+## Run Streamlit Command Port number
 
 - AWS
 ```jupyterpython
