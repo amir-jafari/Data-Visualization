@@ -30,3 +30,14 @@ older or newer versions will cause any issues. All the needed libraries can be i
 
    `pip install -r requirements.txt`
 
+## Run StCommand Port number
+
+- AWS
+```jupyterpython
+python3 -m streamlit run UI_Demo.py --server.port 8888
+```
+
+- Local
+```jupyterpython
+python3 -m streamlit run UI_Demo.py
+```
