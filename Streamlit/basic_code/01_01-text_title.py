@@ -16,4 +16,3 @@ code = """df = pd.DataFrame(
 st.dataframe(df)"""
 st.code(code, language="python")
 
-print('Amir')
