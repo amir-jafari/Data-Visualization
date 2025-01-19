@@ -1,4 +1,4 @@
-## 💫 Basic Codes to Learn Machine Learning
+## 💫 Basic Codes to Learn Data Visualization
 
 
 ## Guide
@@ -18,11 +18,7 @@ This folder contained all the codes needed for data visualization.
 * Python_Vis
 
 
-
-
-
-
-This is a repo that has most updated fundamental of NLP  needed to implement to build a practical solutions. 
+This is a repo that has most updated fundamental of Data Visualization  needed to implement to build a practical solutions. 
 
 
 # 💻 Tech Stack:
