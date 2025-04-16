@@ -2,7 +2,7 @@
 import streamlit as st
 import json
 import time
-from Streamlit.combined_code.NLP.chatbot.Agents.utils_gen_ai_api import invoke_llm_api
+from utils_gen_ai_api import invoke_llm_api
 
 st.set_page_config(page_title="Simple LLM Q&A App", page_icon="🤖")
 
