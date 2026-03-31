@@ -6,6 +6,7 @@ import pandas as pd
 st.subheader("***Display DataFrame***")
 st.write("This variable can be any data format.")
 
+
 # st.echo(): use in a with block to draw some code on the app, then execute it.
 with st.echo():
     df = pd.DataFrame(
