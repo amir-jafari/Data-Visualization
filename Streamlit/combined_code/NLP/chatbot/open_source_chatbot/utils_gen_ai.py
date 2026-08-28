@@ -6,8 +6,13 @@ from transformers import pipeline
 from langchain_core.prompts import PromptTemplate
 from langchain_huggingface import HuggingFacePipeline
 import  streamlit as st
-generate_text = pipeline(model="databricks/dolly-v2-7b", torch_dtype=torch.bfloat16,
-                         trust_remote_code=True, device_map="auto", return_full_text=True)
+# databricks/dolly-v2-7b (and the rest of the dolly-v2 line) has been gated/archived
+# on the Hub -- it 401s even on an unauthenticated HEAD request now. Swapped for a
+# similarly-sized, currently-public instruct model. Phi-3 is natively supported in
+# transformers now, so trust_remote_code=True would load the model repo's own stale
+# custom modeling code instead of the maintained built-in implementation -- dropped it.
+generate_text = pipeline(model="microsoft/Phi-3-mini-4k-instruct", dtype=torch.bfloat16,
+                         device_map="auto", return_full_text=True)
 
 prompt = PromptTemplate(
     input_variables=["instruction"],
