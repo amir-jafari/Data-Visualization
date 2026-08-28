@@ -17,7 +17,7 @@ AWS_ACCESS_KEY_ID = os.getenv("aws_access_key_id")
 AWS_SECRET_ACCESS_KEY = os.getenv("aws_secret_access_key")
 AWS_SESSION_TOKEN = os.getenv("aws_session_token")
 AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
-MODEL_ID = os.getenv("BEDROCK_MODEL_ID") or os.getenv("MODEL_ID", "anthropic.claude-3-5-sonnet-20240620-v1:0")
+MODEL_ID = os.getenv("BEDROCK_MODEL_ID") or os.getenv("MODEL_ID", "us.anthropic.claude-sonnet-4-5-20250929-v1:0")
 print(f"[utils_gen_ai_api] loaded .env from: {ENV_PATH if ENV_PATH.is_file() else f'{ENV_PATH} NOT FOUND'}")
 print(f"[utils_gen_ai_api] using MODEL_ID: {MODEL_ID}")
 
