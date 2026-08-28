@@ -49,7 +49,8 @@ with st.sidebar:
         st.rerun()
 
 # %% ----- User Interface Elements
-user_input = st.text_input("", placeholder="Ask anything...", key=f"user_input_{st.session_state.input_key}")
+user_input = st.text_input("Message", placeholder="Ask anything...",
+                            label_visibility="collapsed", key=f"user_input_{st.session_state.input_key}")
 
 # %% ----- Conversation Display
 for message in st.session_state.messages:
