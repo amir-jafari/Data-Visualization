@@ -14,7 +14,7 @@ AWS_ACCESS_KEY_ID = os.getenv("aws_access_key_id")
 AWS_SECRET_ACCESS_KEY = os.getenv("aws_secret_access_key")
 AWS_SESSION_TOKEN = os.getenv("aws_session_token")
 AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
-MODEL_ID = os.getenv("MODEL_ID", "anthropic.claude-3-5-sonnet-20240620-v1:0")
+MODEL_ID = os.getenv("BEDROCK_MODEL_ID") or os.getenv("MODEL_ID", "anthropic.claude-3-5-sonnet-20240620-v1:0")
 
 # %% ----- LLM API Invocation
 def invoke_llm_api(prompt, conversation_history=None, max_tokens=1000, temperature=0, top_k=250):
