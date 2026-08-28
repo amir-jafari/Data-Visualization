@@ -7,10 +7,10 @@ import json
 from dotenv import load_dotenv
 
 # %% ----- Configuration
-# Always use the .env sitting next to this file -- don't rely on dotenv's
-# upward directory search, which could pick up an unrelated .env elsewhere
-# in the repo tree.
-ENV_PATH = Path(__file__).resolve().parent / ".env"
+# One shared .env for every chatbot app, kept in the parent `chatbot/` dir.
+# Pinned explicitly rather than relying on dotenv's upward directory search,
+# which could pick up an unrelated .env elsewhere in the repo tree.
+ENV_PATH = Path(__file__).resolve().parent.parent / ".env"
 load_dotenv(dotenv_path=ENV_PATH)
 
 AWS_ACCESS_KEY_ID = os.getenv("aws_access_key_id")
