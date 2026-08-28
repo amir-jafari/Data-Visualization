@@ -6,11 +6,18 @@ import streamlit as st
 import random
 import time
 from utils_gen_ai import gen_ai, side_bar
-import os
-path =os.getcwd() + os.sep + 'gwu.jpg'
-left_co, cent_co,last_co = st.columns(3)
+
+# --- make Streamlit/s3_utils.py importable from any sub-folder ----------------
+import sys
+from pathlib import Path
+sys.path.insert(0, str(next(p for p in Path(__file__).resolve().parents
+                            if (p / "s3_utils.py").is_file())))
+import s3_utils
+
+# The logo lives in S3: s3://dats-dl/ajafari@gwu.edu/streamlit/static/gwu.jpg
+left_co, cent_co, last_co = st.columns(3)
 with cent_co:
-    logo = st.image(path, width=100)
+    logo = st.image(s3_utils.read_image('static/gwu.jpg'), width=100)
 
 st.title("NLP Class Chatbot with AI")
 

@@ -75,9 +75,8 @@ def main():
     if data is None:
         st.stop()
 
-    # data = pd.read_csv('/Users/xiaoqi/PycharmProjects/Data-Visualization/Streamlit/combined_code/time_series/forecasting/air_pollution.csv', parse_dates=['date'])
-    # data.set_index('date', inplace=True)
-    # st.write(data.head())
+    # The sample air_pollution.csv now lives in S3 and is offered by the picker above:
+    #   s3://dats-dl/ajafari@gwu.edu/streamlit/data/time_series/forecasting/air_pollution.csv
 
     index_column = st.selectbox(
         'Choose the index column of date information',

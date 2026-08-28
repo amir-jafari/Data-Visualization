@@ -1,19 +1,21 @@
 import streamlit as st
-import os
 import numpy as np
+
+# --- make Streamlit/s3_utils.py importable from any sub-folder ----------------
+import sys
+from pathlib import Path
+sys.path.insert(0, str(next(p for p in Path(__file__).resolve().parents
+                            if (p / "s3_utils.py").is_file())))
+import s3_utils
 
 st.subheader("***Audio***")
 
 
 # st.echo(): use in a with block to draw some code on the app, then execute it.
 with st.echo():
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    os.chdir('..')
-
-    path = os.getcwd() + os.path.sep + 'static' + os.path.sep + 'myaudio.ogg'
-
-    audio_file = open(path, 'rb')
-    audio_bytes = audio_file.read()
+    # s3://dats-dl/ajafari@gwu.edu/streamlit/static/myaudio.ogg
+    # read_bytes() stops the app with a "keys need updating" message if S3 refuses us.
+    audio_bytes = s3_utils.read_bytes('static/myaudio.ogg')
 
     st.audio(audio_bytes, format='audio/ogg')
 
@@ -26,3 +28,5 @@ with st.echo():
     note_la = np.sin(frequency_la * t * 2 * np.pi)
 
     st.audio(note_la, sample_rate=sample_rate)
+
+st.caption(f"Source: {s3_utils.uri('static/myaudio.ogg')}")

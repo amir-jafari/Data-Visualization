@@ -1,28 +1,35 @@
 import streamlit as st
-import os
 import numpy as np
 import pandas as pd
+
+# --- make Streamlit/s3_utils.py importable from any sub-folder ----------------
+import sys
+from pathlib import Path
+sys.path.insert(0, str(next(p for p in Path(__file__).resolve().parents
+                            if (p / "s3_utils.py").is_file())))
+import s3_utils
 
 # %%--------------------------------------------------------------------------------------------------------------------
 st.subheader("***Download button***")
 
 st.write("***Download an image***")
+st.write("The image is fetched from S3 first, then handed to the download button.")
 
 
 # st.echo(): use in a with block to draw some code on the app, then execute it.
 with st.echo():
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    os.chdir('..')
+    # s3://dats-dl/ajafari@gwu.edu/streamlit/static/flower.png
+    # read_bytes() stops the app with a "keys need updating" message if S3 refuses us.
+    data = s3_utils.read_bytes('static/flower.png')
 
-    path = os.getcwd() + os.path.sep + 'static' + os.path.sep + 'flower.png'
+    btn = st.download_button(
+            label="Download image",
+            data=data,
+            file_name="flower.png",
+            mime="image/png"
+          )
 
-    with open(path, "rb") as file:
-        btn = st.download_button(
-                label="Download image",
-                data=file,
-                file_name="flower.png",
-                mime="image/png"
-              )
+st.caption(f"Source: {s3_utils.uri('static/flower.png')}")
 
 
 st.write('#')

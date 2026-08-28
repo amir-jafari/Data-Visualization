@@ -5,6 +5,18 @@ import nltk
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+# --- make Streamlit/s3_utils.py importable from any sub-folder ----------------
+import sys
+from pathlib import Path
+sys.path.insert(0, str(next(p for p in Path(__file__).resolve().parents
+                            if (p / "s3_utils.py").is_file())))
+import s3_utils
+
+# All data for this app lives in S3, never on disk:
+#   s3://dats-dl/ajafari@gwu.edu/streamlit/data/NLP/text_classification/
+S3_FOLDER = "data/NLP/text_classification"
+
+
 
 def text_pre_processing(text, flg_stemm=False, flg_lemm=True, lst_stopwords=None):
     text = re.sub(r'[^\w\s]', '', str(text).lower().strip())
@@ -22,7 +34,10 @@ def text_pre_processing(text, flg_stemm=False, flg_lemm=True, lst_stopwords=None
 
 
 def upload_file(file_name):
-    file = st.file_uploader(f"Choose the {file_name}", type="csv")
+    # Defaults to browsing S3; "Upload from my computer" is the fallback.
+    # prefer= keeps the Train picker on Train.csv and the Test picker on Test.csv
+    file = s3_utils.file_input(file_name, folder=S3_FOLDER, types=["csv"],
+                               prefer=file_name.split()[0])
 
     if file is not None:
         df = pd.read_csv(file)

@@ -1,23 +1,21 @@
-import os
 import streamlit as st
 import base64
 
+# --- make Streamlit/s3_utils.py importable from any sub-folder ----------------
+import sys
+from pathlib import Path
+sys.path.insert(0, str(next(p for p in Path(__file__).resolve().parents
+                            if (p / "s3_utils.py").is_file())))
+import s3_utils
+
 st.subheader("***Background***")
-st.write('Setup the webpage background.')
+st.write('Setup the webpage background. The image comes from S3, not from disk.')
 
 
 with st.echo():
-    # @st.cache_data
     @st.cache_data
-    def get_base64_of_bin_file(bin_file):
-        with open(bin_file, 'rb') as f:
-            data = f.read()
-        return base64.b64encode(data).decode()
-
-
-    @st.cache_data
-    def set_png_as_page_bg(png_file):
-        bin_str = get_base64_of_bin_file(png_file)
+    def set_png_as_page_bg(image_bytes):
+        bin_str = base64.b64encode(image_bytes).decode()
         page_bg_img = '''
         <style>
         .stApp {
@@ -33,8 +31,8 @@ with st.echo():
         return
 
 
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    os.chdir('..')
+    # s3://dats-dl/ajafari@gwu.edu/streamlit/static/background.webp
+    # read_bytes() stops the app with a "keys need updating" message if S3 refuses us.
+    set_png_as_page_bg(s3_utils.read_bytes('static/background.webp'))
 
-    file_name = os.getcwd() + os.path.sep + 'static' + os.path.sep + 'background.webp'
-    set_png_as_page_bg(file_name)
+st.caption(f"Source: {s3_utils.uri('static/background.webp')}")
