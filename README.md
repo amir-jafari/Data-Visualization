@@ -1,7 +1,7 @@
 # 🎈 Learn Streamlit
 
-[![Python](https://img.shields.io/badge/Python-3.9%E2%80%933.12-blue.svg)](https://www.python.org/downloads/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-1.28-red.svg)](https://streamlit.io/)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-1.60-red.svg)](https://streamlit.io/)
 [![License](https://img.shields.io/badge/License-MIT-blue)](#license)
 
 Course material for building data apps with **Streamlit** — from `st.title()` to
@@ -91,9 +91,12 @@ the retry button in the app. No restart needed. Full details in
 
 ## Troubleshooting
 
-**`ImportError: numpy.core.multiarray failed to import`** — something pulled in
-numpy 2.x. This stack is pinned to numpy 1.x on purpose. Fix it with
-`pip install -r requirements.txt --force-reinstall`.
+**Python version** — Streamlit 1.60 needs **Python 3.10 or newer**. Check with
+`python --version` before anything else.
+
+**A lesson says it needs a package** — the launcher tells you which one and gives
+you the `pip install` line. That only happens for optional extras; everything in
+`requirements.txt` covers the rest.
 
 **`streamlit: command not found`** — your virtual environment isn't active, or
 you installed into a different one. Use `python -m streamlit run app.py`.
