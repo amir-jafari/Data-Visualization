@@ -28,7 +28,7 @@ def main():
 
     if my_upload is not None:
         image = Image.open(my_upload)
-        st.image(image, caption="Uploaded Image", use_column_width=True)
+        st.image(image, caption="Uploaded Image", width="stretch")
 
         st.divider()
         st.subheader("Step 2: Choose a model from left side bar")
@@ -51,7 +51,7 @@ def main():
         results_img_pil = Image.fromarray(results_img)
 
         # Use Streamlit to write the image to the webpage
-        st.image(results_img_pil, caption='Detected Objects', use_column_width=True)
+        st.image(results_img_pil, caption='Detected Objects', width="stretch")
 
 
 if __name__ == "__main__":

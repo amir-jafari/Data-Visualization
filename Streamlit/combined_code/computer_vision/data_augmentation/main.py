@@ -40,7 +40,7 @@ def main():
         # Convert BGR to RGB
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-        st.image(image, caption="Uploaded Image", use_column_width=True)
+        st.image(image, caption="Uploaded Image", width="stretch")
 
         st.divider()
         st.subheader("Step 2: Some data augmentation demos")
@@ -77,7 +77,7 @@ def main():
             transform = A.Compose(aug_lst)
             # random.seed(42)
             augmented_image = transform(image=image)['image']
-            st.image(augmented_image, caption="augmented Image", use_column_width=False)
+            st.image(augmented_image, caption="augmented Image", width="content")
 
 
 if __name__ == "__main__":

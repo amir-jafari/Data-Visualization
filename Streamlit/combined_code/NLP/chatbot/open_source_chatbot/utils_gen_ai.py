@@ -1,7 +1,10 @@
 import torch
 from transformers import pipeline
-from langchain import PromptTemplate, LLMChain
-from langchain.llms import HuggingFacePipeline
+# langchain >=1.0 removed the top-level `PromptTemplate`/`LLMChain` shortcuts and moved
+# HuggingFacePipeline out of `langchain.llms` into the separate `langchain_huggingface`
+# integration package. LCEL (the `prompt | llm` pipe syntax) replaces LLMChain.
+from langchain_core.prompts import PromptTemplate
+from langchain_huggingface import HuggingFacePipeline
 import  streamlit as st
 generate_text = pipeline(model="databricks/dolly-v2-7b", torch_dtype=torch.bfloat16,
                          trust_remote_code=True, device_map="auto", return_full_text=True)
@@ -19,12 +22,12 @@ hf_pipeline = HuggingFacePipeline(pipeline=generate_text)
 def gen_ai(context=None, prompt=None):
 
     if not context:
-        llm_context_chain = LLMChain(llm=hf_pipeline, prompt=prompt_with_context)
-        answer= llm_context_chain.predict(instruction=f"{prompt}", context=context).lstrip()
+        llm_context_chain = prompt_with_context | hf_pipeline
+        answer = llm_context_chain.invoke({"instruction": f"{prompt}", "context": context}).lstrip()
 
     else:
-        llm_chain = LLMChain(llm=hf_pipeline, prompt=prompt)
-        answer = llm_chain.predict(instruction=f"{prompt}").lstrip()
+        llm_chain = prompt | hf_pipeline
+        answer = llm_chain.invoke({"instruction": f"{prompt}"}).lstrip()
 
     return  answer
 

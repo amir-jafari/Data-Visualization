@@ -31,7 +31,7 @@ def main():
 
     if my_upload is not None:
         image = Image.open(my_upload)
-        st.image(image, caption="Uploaded Image", use_column_width=True)
+        st.image(image, caption="Uploaded Image", width="stretch")
 
         st.divider()
         st.subheader("Step 2: Choose a model from left side bar")
