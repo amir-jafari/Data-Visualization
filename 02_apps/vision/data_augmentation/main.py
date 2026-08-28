@@ -49,7 +49,7 @@ def main():
 
         with col1:
             utils.do_image_augment(image, 'A.HorizontalFlip(p=1)')
-            utils.do_image_augment(image, 'A.Blur(blur_limit=100, p=1)')
+            utils.do_image_augment(image, 'A.Blur(blur_limit=101, p=1)')
             utils.do_image_augment(image, 'A.ToGray(p=1)')
 
         with col2:
@@ -58,7 +58,7 @@ def main():
             utils.do_image_augment(image, 'A.RandomBrightnessContrast(brightness_limit=0.8, contrast_limit=0.8, p=1)')
 
         with col3:
-            utils.do_image_augment(image, 'A.ShiftScaleRotate(p=1)')
+            utils.do_image_augment(image, 'A.Affine(translate_percent=(-0.0625, 0.0625), scale=(0.9, 1.1), rotate=(-45, 45), p=1)')
             utils.do_image_augment(image, 'A.GridDistortion(p=1)')
             utils.do_image_augment(image, 'A.HueSaturationValue(hue_shift_limit=20, sat_shift_limit=30, val_shift_limit=20, p=1)')
 

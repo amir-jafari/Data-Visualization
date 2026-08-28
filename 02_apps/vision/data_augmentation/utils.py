@@ -9,10 +9,12 @@ def sidebar():
         # Define a list of options
         options = [
             (A.RandomRotate90(), "A.RandomRotate90()"),
-            (A.ShiftScaleRotate(p=0.6), "A.ShiftScaleRotate()"),
+            (A.Affine(translate_percent=(-0.0625, 0.0625), scale=(0.9, 1.1),
+                      rotate=(-45, 45), p=0.6), "A.Affine()"),
             (A.Transpose(), "A.Transpose()"),
             (A.MotionBlur(p=.6), "A.MotionBlur()",),
-            (A.ShiftScaleRotate(shift_limit=0.0625, scale_limit=0.2, rotate_limit=45, p=0.6), "A.ShiftScaleRotate()"),
+            (A.Affine(translate_percent=(-0.0625, 0.0625), scale=(0.8, 1.2),
+                      rotate=(-45, 45), p=0.6), "A.Affine(scale=(0.8, 1.2))"),
             (A.OpticalDistortion(p=0.8), "A.OpticalDistortion()"),
             (A.Sharpen(), "A.Sharpen()",),
             (A.HueSaturationValue(p=0.6), "A.HueSaturationValue()"),
