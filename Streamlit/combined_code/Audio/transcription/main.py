@@ -30,7 +30,9 @@ def main():
                                         types=['mp3', 'wav', 'ogg', 'flac'])
 
     if uploaded_file is not None:
-        y, sr = librosa.load(uploaded_file)
+        # wav2vec2-base-960h was trained on 16kHz audio -- resample here so the
+        # model gets the sample rate it expects instead of librosa's 22050Hz default.
+        y, sr = librosa.load(uploaded_file, sr=16000)
         print('len(y), sr', len(y), sr)
 
         st.audio(y, format='audio/ogg', sample_rate=sr)
@@ -53,7 +55,7 @@ def main():
             st.session_state['model'] = Wav2Vec2ForCTC.from_pretrained(model_name)
 
         # tokenize
-        input_values = st.session_state['processor'](y, return_tensors="pt", padding="longest").input_values  # Batch size 1
+        input_values = st.session_state['processor'](y, sampling_rate=sr, return_tensors="pt", padding="longest").input_values  # Batch size 1
 
         # retrieve logits
         logits = st.session_state['model'](input_values).logits
