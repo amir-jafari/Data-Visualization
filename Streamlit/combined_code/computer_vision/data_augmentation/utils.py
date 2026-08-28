@@ -39,7 +39,7 @@ def do_image_augment(image, transform_str):
     # Evaluate the string as Python code
     transform = eval(transform_str)
     augmented_image = transform(image=image)['image']
-    st.image(augmented_image, caption=transform_str, use_column_width=True)
+    st.image(augmented_image, caption=transform_str, width="stretch")
 
 
 def convert_image(img):

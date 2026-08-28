@@ -1,18 +1,25 @@
 # %% ----- Imports
 import os
 import boto3
+from pathlib import Path
 from botocore.exceptions import ClientError
 import json
 from dotenv import load_dotenv
 
 # %% ----- Configuration
-load_dotenv()
+# Always use the .env sitting next to this file -- don't rely on dotenv's
+# upward directory search, which could pick up an unrelated .env elsewhere
+# in the repo tree.
+ENV_PATH = Path(__file__).resolve().parent / ".env"
+load_dotenv(dotenv_path=ENV_PATH)
 
 AWS_ACCESS_KEY_ID = os.getenv("aws_access_key_id")
 AWS_SECRET_ACCESS_KEY = os.getenv("aws_secret_access_key")
 AWS_SESSION_TOKEN = os.getenv("aws_session_token")
 AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
-MODEL_ID = os.getenv("MODEL_ID", "anthropic.claude-3-5-sonnet-20240620-v1:0")
+MODEL_ID = os.getenv("BEDROCK_MODEL_ID") or os.getenv("MODEL_ID", "anthropic.claude-3-5-sonnet-20240620-v1:0")
+print(f"[utils_gen_ai_api] loaded .env from: {ENV_PATH if ENV_PATH.is_file() else f'{ENV_PATH} NOT FOUND'}")
+print(f"[utils_gen_ai_api] using MODEL_ID: {MODEL_ID}")
 
 # %% ----- LLM API Invocation
 def invoke_llm_api(prompt, conversation_history=None, max_tokens=1000, temperature=0, top_k=250):
@@ -60,6 +67,8 @@ def invoke_llm_api(prompt, conversation_history=None, max_tokens=1000, temperatu
         return response_body.strip()
 
     except ClientError as e:
+        print(f"[invoke_llm_api] Bedrock ClientError: {e.response.get('Error', {})}")
         return None
     except Exception as e:
+        print(f"[invoke_llm_api] {type(e).__name__}: {e}")
         return None

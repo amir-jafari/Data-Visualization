@@ -50,7 +50,10 @@ def main():
     if not model_name:
         st.stop()
 
-    classifier = naive_bayes.MultinomialNB() if model_name == 'Naive Bayes' else LogisticRegression(solver='liblinear')
+    # liblinear only handles multiclass via an implicit one-vs-rest fallback that
+    # newer scikit-learn no longer applies automatically; lbfgs supports multiclass
+    # (and binary) natively.
+    classifier = naive_bayes.MultinomialNB() if model_name == 'Naive Bayes' else LogisticRegression(solver='lbfgs')
 
     model = pipeline.Pipeline([("vectorizer", vectorizer), ("classifier", classifier)])
     model["classifier"].fit(X_train, y_train)

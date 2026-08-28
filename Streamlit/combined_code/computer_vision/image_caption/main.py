@@ -2,7 +2,7 @@
 # https://huggingface.co/docs/transformers/main/tasks/image_captioning
 
 import streamlit as st
-from transformers import pipeline
+from transformers import AutoModelForImageTextToText, AutoImageProcessor, AutoTokenizer
 from PIL import Image
 
 import utils
@@ -30,8 +30,8 @@ def main():
     my_upload = s3_utils.file_input("image", folder=S3_FOLDER, types=["png", "jpg", "jpeg"])
 
     if my_upload is not None:
-        image = Image.open(my_upload)
-        st.image(image, caption="Uploaded Image", use_column_width=True)
+        image = Image.open(my_upload).convert("RGB")
+        st.image(image, caption="Uploaded Image", width="stretch")
 
         st.divider()
         st.subheader("Step 2: Choose a model from left side bar")
@@ -45,10 +45,22 @@ def main():
         st.subheader("Step 3: Get the caption of the image")
 
         if model_name not in st.session_state:
-            st.session_state[model_name] = pipeline('image-to-text', model=model_name)
+            # transformers 5.x removed the "image-to-text" pipeline task, and the
+            # replacement "image-text-to-text" pipeline requires a bundled
+            # AutoProcessor, which older captioning checkpoints like
+            # ydshieh/vit-gpt2-coco-en don't ship. Load the pieces directly instead,
+            # which works whether or not the repo has a combined processor.
+            st.session_state[model_name] = {
+                "model": AutoModelForImageTextToText.from_pretrained(model_name),
+                "image_processor": AutoImageProcessor.from_pretrained(model_name),
+                "tokenizer": AutoTokenizer.from_pretrained(model_name),
+            }
 
-        captions = st.session_state[model_name](image)
-        st.write(captions[0]['generated_text'])
+        bundle = st.session_state[model_name]
+        pixel_values = bundle["image_processor"](images=image, return_tensors="pt").pixel_values
+        output_ids = bundle["model"].generate(pixel_values, max_new_tokens=50)
+        caption = bundle["tokenizer"].decode(output_ids[0], skip_special_tokens=True)
+        st.write(caption)
 
 
 if __name__ == "__main__":
