@@ -1,6 +1,14 @@
-/.idea
-/Python_Vis/Exsercise Sol/
-**/.DS_Store
-.venv
-**/*.pyc
+# credentials -- never commit these
 .env
+*.pem
+
+# python
+__pycache__/
+**/*.pyc
+.venv/
+venv/
+
+# editors / os
+.idea/
+.vscode/
+**/.DS_Store

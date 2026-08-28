@@ -1,0 +1,30 @@
+# Extras for 02_apps/ only -- a large ML stack, several GB, slow to install.
+# Install after requirements.txt, and only if you are running those demos:
+#     pip install -r requirements.txt -r requirements-apps.txt
+
+scipy==1.13.1
+scikit-learn==1.5.1
+seaborn==0.13.2
+statsmodels==0.14.2    # data_mining/linear_regression
+tqdm==4.66.1
+watchdog==3.0.0        # faster file-watching for streamlit
+
+# nlp/
+nltk==3.8.1
+textblob==0.17.1
+transformers==4.36.2
+torch==2.1.0
+python-dotenv==1.0.1   # nlp/chatbot reads its AWS keys from a .env
+langchain-core==0.3.0          # nlp/chatbot/open_source_chatbot
+langchain-huggingface==0.1.2   # nlp/chatbot/open_source_chatbot
+
+# vision/
+keras==2.14.0
+tensorflow==2.14.0
+rembg==2.0.52          # background_remover
+pooch==1.8.0
+ultralytics==8.0.207   # object_detection
+albumentations==1.3.1  # data_augmentation
+
+# audio/
+librosa==0.10.1        # do NOT bump: 1.x requires numpy>=2.1
