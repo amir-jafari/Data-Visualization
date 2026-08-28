@@ -85,7 +85,8 @@ if st.session_state.current_agent == "doctor":
 else:
     st.info("🤒 You are currently in the **Patient** role. Ask questions about medical concerns.")
 
-user_input = st.text_input("", placeholder="Type your message...", key=f"user_input_{st.session_state.input_key}")
+user_input = st.text_input("Message", placeholder="Type your message...",
+                            label_visibility="collapsed", key=f"user_input_{st.session_state.input_key}")
 
 for message in st.session_state.messages:
     if message["role"] == "user":

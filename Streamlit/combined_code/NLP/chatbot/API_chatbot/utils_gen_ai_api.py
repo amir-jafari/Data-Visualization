@@ -62,6 +62,8 @@ def invoke_llm_api(prompt, conversation_history=None, max_tokens=1000, temperatu
         return response_body.strip()
 
     except ClientError as e:
+        print(f"[invoke_llm_api] Bedrock ClientError: {e.response.get('Error', {})}")
         return None
     except Exception as e:
+        print(f"[invoke_llm_api] {type(e).__name__}: {e}")
         return None
