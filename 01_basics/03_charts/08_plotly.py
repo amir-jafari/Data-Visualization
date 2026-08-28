@@ -24,4 +24,4 @@ with st.echo():
             hist_data, group_labels, bin_size=[.1, .25, .5])
 
     # Plot!
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')

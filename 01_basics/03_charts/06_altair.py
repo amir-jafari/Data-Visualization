@@ -16,5 +16,5 @@ with st.echo():
        .encode(x="a", y="b", size="c", color="c", tooltip=["a", "b", "c"])
     )
 
-    st.altair_chart(c, use_container_width=True)
+    st.altair_chart(c, width='stretch')
 

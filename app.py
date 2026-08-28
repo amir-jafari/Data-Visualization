@@ -77,8 +77,8 @@ with demo_tab:
         # A missing package is a setup problem, not a broken lesson -- say which
         # one and how to get it, instead of showing a traceback.
         st.warning(f"This lesson needs a package you don't have: **{exc.name}**")
-        st.code(f"pip install -r requirements.txt   # installs {exc.name}",
-                language="bash")
+        st.caption("Install it, then press R to reload:")
+        st.code(f"pip install {exc.name.replace('_', '-')}", language="bash")
     except Exception as exc:  # a broken lesson should not kill the launcher
         if "set_page_config" in str(exc):
             # The launcher already configured the page, so a lesson that calls

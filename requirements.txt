@@ -1,24 +1,19 @@
 # Core stack -- everything in 01_basics/ and the launcher (app.py).
-# Small and fast: this is all a student needs for week one.
+# Small and fast: this is all you need for the lessons.
 #
-# IMPORTANT: pinned to numpy 1.x. matplotlib and pandas here are compiled
-# against the numpy 1.x C-API, so anything that pulls numpy>=2 breaks them
-# with "ImportError: numpy.core.multiarray failed to import".
+# Versions match the course server. Streamlit 1.60 needs Python >= 3.10.
 
-streamlit==1.28.1
+streamlit==1.60.0
 
-pandas==2.2.2
-numpy==1.26.4          # do NOT bump to 2.x
-matplotlib==3.9.2
-pillow==10.4.0
+numpy==2.0.2
+pandas==3.0.5
+matplotlib==3.11.1
+pillow==12.3.0
+scipy==1.13.1          # plotly's create_distplot needs it (03_charts/08_plotly.py)
 
 # charts used by 01_basics/03_charts
-plotly==5.17.0
-altair==5.1.2
-vega_datasets==0.9.0
-
-# 01_basics/11_extras/02_drawable_canvas.py
-streamlit-drawable-canvas==0.9.3
+plotly==6.2.0
+altair==6.2.2
 
 # all sample data and media are read from S3 -- see s3/README.md
-boto3>=1.34
+boto3==1.43.56

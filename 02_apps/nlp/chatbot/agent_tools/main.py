@@ -57,11 +57,11 @@ with st.sidebar:
     with col1:
         doctor_button = st.button("👨‍⚕️ Doctor", 
                                  type="primary" if st.session_state.current_agent == "doctor" else "secondary",
-                                 use_container_width=True)
+                                 width='stretch')
     with col2:
         patient_button = st.button("🤒 Patient", 
                                   type="primary" if st.session_state.current_agent == "patient" else "secondary",
-                                  use_container_width=True)
+                                  width='stretch')
 
     if doctor_button and st.session_state.current_agent != "doctor":
         st.session_state.current_agent = "doctor"
