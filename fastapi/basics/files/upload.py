@@ -88,6 +88,12 @@ async def upload_csv(file: UploadFile):
     except Exception as exc:
         raise HTTPException(400, f"Could not parse that as CSV: {exc}")
 
+    # pandas is lenient -- it will happily read binary junk as a one-column
+    # table rather than raising. So the try/except above is not the real
+    # defence; checking that the result makes sense is.
+    if frame.empty or len(frame.columns) == 0:
+        raise HTTPException(400, "That file parsed, but contains no usable rows")
+
     return {
         "filename": file.filename,
         "rows": len(frame),
