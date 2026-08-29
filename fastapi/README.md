@@ -38,6 +38,7 @@ code, and it is where you should try every endpoint in this course.
 
 | | |
 | --- | --- |
+| **[`CONCEPTS.md`](CONCEPTS.md)** | **The ideas in plain words** — analogies, what to demo live, and what students get wrong. Start here if you are teaching it. |
 | **`run.py`** | Lists the lessons and runs one with auto-reload. |
 | **`basics/`** | 24 one-idea-per-file lessons. [Details →](basics/README.md) |
 | **`project/`** | The Data API: all of it, assembled, plus a Streamlit client. [Details →](project/README.md) |

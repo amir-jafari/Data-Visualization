@@ -25,6 +25,9 @@ the fastest way to try an endpoint — no curl, no Postman.
 
 Read them in that order — each chapter assumes the one before it.
 
+For the ideas behind these files — analogies, demos and the mistakes students
+make — see [`../CONCEPTS.md`](../CONCEPTS.md).
+
 ## Three things worth knowing early
 
 **The type hints are not decoration.** `item_id: int` converts the value,
