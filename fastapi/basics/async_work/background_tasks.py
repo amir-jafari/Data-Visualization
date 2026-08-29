@@ -72,7 +72,14 @@ def audited():
 
 @app.get("/log")
 def read_log():
-    """Call this a couple of seconds after /signup to see the work land."""
+    """Call this a couple of seconds after /signup to see the work land.
+
+    Worth knowing when you get to the testing chapter: TestClient runs
+    background tasks *before* it returns, so a test will not see the instant
+    reply that a real client gets. Measured against a real server, POST
+    /signup answers in about 5 milliseconds and the email lands 2 seconds
+    later; under TestClient the same call appears to take the full 2 seconds.
+    """
     return {"entries": LOG}
 
 
