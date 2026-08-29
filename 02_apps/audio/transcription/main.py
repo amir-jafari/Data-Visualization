@@ -33,7 +33,6 @@ def main():
         # wav2vec2-base-960h was trained on 16kHz audio -- resample here so the
         # model gets the sample rate it expects instead of librosa's 22050Hz default.
         y, sr = librosa.load(uploaded_file, sr=16000)
-        print('len(y), sr', len(y), sr)
 
         st.audio(y, format='audio/ogg', sample_rate=sr)
 

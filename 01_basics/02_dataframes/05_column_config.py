@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime, date, time
 
-# %%--------------------------------------------------------------------------------------------------------------------
 st.subheader("***Column configuration***")
 st.write("Configure the display and editing behavior of dataframes and data editors")
 st.write("The columns, from left to right, are ***text, number, checkbox, selectbox, and datetime***")
@@ -71,7 +70,6 @@ with expander:
     st.code(code, language='python')
 
 
-# %%--------------------------------------------------------------------------------------------------------------------
 st.write("\n\n")
 st.write("\n\n")
 st.write("The columns, from left to right, are ***date, time, list, and link***")
@@ -146,7 +144,6 @@ with expander:
     st.code(code, language='python')
 
 
-# %%--------------------------------------------------------------------------------------------------------------------
 st.write("\n\n")
 st.write("\n\n")
 st.write("The columns, from left to right, are ***image, line chart, bar chart, and progress***")

@@ -2,7 +2,6 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 
-# %%--------------------------------------------------------------------------------------------------------------------
 st.subheader("***Vega-Lite library chart***")
 st.write(
     "`st.altair_chart` builds the chart in Python. `st.vega_lite_chart` skips "

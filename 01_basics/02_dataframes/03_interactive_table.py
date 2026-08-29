@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import random
 
-# %%--------------------------------------------------------------------------------------------------------------------
 st.subheader("***Advanced Plotting in DataFrame***")
 
 # st.echo(): use in a with block to draw some code on the app, then execute it.

@@ -2,7 +2,6 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 
-# %%--------------------------------------------------------------------------------------------------------------------
 st.subheader("***Plotly chart***")
 
 # st.echo(): use in a with block to draw some code on the app, then execute it.

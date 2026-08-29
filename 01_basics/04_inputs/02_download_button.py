@@ -9,7 +9,6 @@ REPO_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "s3").is_di
 sys.path.insert(0, str(REPO_ROOT))
 from s3 import s3_utils
 
-# %%--------------------------------------------------------------------------------------------------------------------
 st.subheader("***Download button***")
 
 st.write("***Download an image***")

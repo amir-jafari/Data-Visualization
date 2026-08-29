@@ -19,7 +19,6 @@ def main():
         st.subheader("Step 3: Get the sentiment")
 
         result = utils.analyze_sentiment(txt)
-        print(result)
         polarity = result.polarity
 
         score = round(polarity, 2)

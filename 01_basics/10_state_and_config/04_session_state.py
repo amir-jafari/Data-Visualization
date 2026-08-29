@@ -15,7 +15,7 @@ with st.echo():
         st.session_state.key = 'value'
 
     # Read
-    print(st.session_state.key)
+    st.write(st.session_state.key)
 
     # Update an item in Session State by assigning it a value:
     st.session_state.key = 'value2'  # Attribute API

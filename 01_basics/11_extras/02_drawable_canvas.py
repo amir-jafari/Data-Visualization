@@ -17,7 +17,6 @@ except ModuleNotFoundError:
     st.code("pip install streamlit-drawable-canvas", language="bash")
     st.stop()
 
-# %%--------------------------------------------------------------------------------------------------------------------
 # Create a canvas with size, color, and other options for interactivity
 canvas_result = st_canvas(
     fill_color="rgba(255, 165, 0, 0.3)",  # Fixed fill color with some opacity

@@ -94,8 +94,9 @@ def random_forest_predict(X_train, y_train, X_test, columns):
     f_importances.sort_values(ascending=False, inplace=True)
 
     st.write('Plot feature importances in descending order')
-    f_importances.plot(x='Features', y='Importance', kind='bar')
-    st.pyplot(plt)
+    fig, ax = plt.subplots()
+    f_importances.plot(x='Features', y='Importance', kind='bar', ax=ax)
+    st.pyplot(fig)
 
     if st.toggle('Use K features to do predict'):
         f_importances_lst = f_importances.index.tolist()
@@ -186,7 +187,8 @@ def Logistic_predict(X_train, y_train):
 
 
 def draw(cm):
-    sns.heatmap(cm, annot=True)
-    plt.xlabel('Predicted')
-    plt.ylabel('Actual')
-    st.pyplot(plt)
+    fig, ax = plt.subplots()
+    sns.heatmap(cm, annot=True, ax=ax)
+    ax.set_xlabel('Predicted')
+    ax.set_ylabel('Actual')
+    st.pyplot(fig)

@@ -10,7 +10,6 @@ st.markdown("Here's a bouquet &mdash;\
             :tulip::cherry_blossom::rose::hibiscus::sunflower::blossom:")
 
 
-# %%--------------------------------------------------------------------------------------------------------------------
 st.divider()
 
 md = st.text_area('Type in your markdown string (without outer quotes)',

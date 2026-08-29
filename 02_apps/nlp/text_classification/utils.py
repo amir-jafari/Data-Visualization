@@ -70,10 +70,11 @@ def sidebar():
 
 
 def draw(cm):
-    sns.heatmap(cm, annot=True)
-    plt.xlabel('Predicted')
-    plt.ylabel('Actual')
-    st.pyplot(plt)
+    fig, ax = plt.subplots()
+    sns.heatmap(cm, annot=True, ax=ax)
+    ax.set_xlabel('Predicted')
+    ax.set_ylabel('Actual')
+    st.pyplot(fig)
 
 
 def download_file(df, model_name):

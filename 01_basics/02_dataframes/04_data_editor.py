@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime, date, time
 
-# %%--------------------------------------------------------------------------------------------------------------------
 st.subheader("***Data editor***")
 st.write("Use to display and interact with raw data. Edit dataframes and many other data structures in a table-like UI.")
 

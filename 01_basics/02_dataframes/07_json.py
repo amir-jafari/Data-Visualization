@@ -1,6 +1,5 @@
 import streamlit as st
 
-# %%--------------------------------------------------------------------------------------------------------------------
 
 st.subheader("***Dicts and JSON***")
 st.write("Display object or string as a pretty-printed JSON string.")

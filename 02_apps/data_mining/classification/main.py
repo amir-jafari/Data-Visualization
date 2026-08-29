@@ -116,10 +116,10 @@ def main():
 
             with col1:
                 # Boxplot for a numerical column
-                plt.figure()
-                sns.boxplot(x=data[plot_column])
-                plt.title('Boxplot of numerical_column')
-                st.pyplot(plt)
+                fig, ax = plt.subplots()
+                sns.boxplot(x=data[plot_column], ax=ax)
+                ax.set_title('Boxplot of numerical_column')
+                st.pyplot(fig)
 
                 # # Histogram for a numerical column
                 # plt.figure(figsize=(8, 6))
@@ -131,12 +131,12 @@ def main():
 
             with col2:
                 # Bar chart for a categorical column
-                plt.figure()
-                sns.countplot(x=data[plot_column])
-                plt.title('Count of categorical_column')
-                plt.xlabel('Category')
-                plt.ylabel('Count')
-                st.pyplot(plt)
+                fig, ax = plt.subplots()
+                sns.countplot(x=data[plot_column], ax=ax)
+                ax.set_title('Count of categorical_column')
+                ax.set_xlabel('Category')
+                ax.set_ylabel('Count')
+                st.pyplot(fig)
 
 
     st.divider()

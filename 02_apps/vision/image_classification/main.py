@@ -51,7 +51,6 @@ def main():
 
     # classification_pipeline = pipeline("image-classification", model=model_name)
     result = st.session_state['pipe'](image)
-    print(result)
 
     st.write(f"Predicted class: {result[0]['label']}")
 

@@ -7,13 +7,11 @@ REPO_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "s3").is_di
 sys.path.insert(0, str(REPO_ROOT))
 from s3 import s3_utils
 
-# %%--------------------------------------------------------------------------------------------------------------------
 st.header("Media elements")
 st.write("It's easy to embed images, videos, and audio files directly into your Streamlit apps.")
 st.write("The media below is not on disk -- it is pulled from S3 every time this page runs.")
 
 
-# %%--------------------------------------------------------------------------------------------------------------------
 st.divider()
 st.subheader("***Image***")
 
