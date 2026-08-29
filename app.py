@@ -52,6 +52,8 @@ def purge_local_modules():
     """
     root_str = str(ROOT)
     for name, mod in list(sys.modules.items()):
+        if name == "__main__":
+            continue  # this launcher script itself -- runpy needs it intact
         mod_file = getattr(mod, "__file__", None)
         if mod_file and mod_file.startswith(root_str):
             del sys.modules[name]
@@ -123,6 +125,14 @@ with demo_tab:
     # same as Streamlit does when you run the file directly.
     purge_local_modules()
     sys.path.insert(0, str(item.parent))
+    # The launcher already called st.set_page_config() once for the whole
+    # page. Several apps/lessons call it again themselves (it's normally the
+    # first line of their script) -- Streamlit only allows one call per page
+    # and raises, which would abort the rest of the script before anything
+    # else (sidebar widgets included) ever renders. No-op it for the duration
+    # of this run so those scripts keep going past that line.
+    real_set_page_config = st.set_page_config
+    st.set_page_config = lambda *args, **kwargs: None
     try:
         runpy.run_path(str(item), run_name="__main__")
     except ModuleNotFoundError as exc:
@@ -132,11 +142,7 @@ with demo_tab:
         st.caption("Install it, then press R to reload:")
         st.code(f"pip install {exc.name.replace('_', '-')}", language="bash")
     except Exception as exc:  # a broken lesson/app should not kill the launcher
-        if "set_page_config" in str(exc):
-            # The launcher already configured the page, so a lesson/app that
-            # calls st.set_page_config() cannot -- it only works once per page.
-            st.info("Run this on its own to see it work — see the sidebar.")
-        else:
-            st.exception(exc)
+        st.exception(exc)
     finally:
+        st.set_page_config = real_set_page_config
         sys.path.remove(str(item.parent))
