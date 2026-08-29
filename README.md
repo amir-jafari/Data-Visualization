@@ -104,12 +104,6 @@ you installed into a different one. Use `python -m streamlit run app.py`.
 **Port already in use** — another app is still running. Pick another port:
 `streamlit run app.py --server.port 8888`.
 
-**Debugging in PyCharm** — Streamlit apps aren't run with `python file.py`, so
-set the run configuration to *module* `streamlit.web.cli` with `run yourfile.py`
-as the argument. See [`docs/pycharm_debug.png`](docs/pycharm_debug.png). On
-Windows, point PyCharm's terminal at your conda env under
-*File → Settings → Tools → Terminal*.
-
 ---
 
 ## License
