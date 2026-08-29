@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from .. import model as model_module
 from ..deps import require_api_key
-from ..schemas import ModelInfo, PredictResponse, Prediction
+from ..schemas import ModelInfo, PredictRequest, PredictResponse, Prediction
 
 router = APIRouter(prefix="/model", tags=["model"])
 
@@ -36,14 +36,14 @@ def model_info(trained: model_module.TrainedModel = Depends(loaded_model)):
 @router.post("/predict", response_model=PredictResponse,
              dependencies=[Depends(require_api_key)])
 def predict(
-    request: "PredictRequest",
+    request: PredictRequest,
     trained: model_module.TrainedModel = Depends(loaded_model),
 ):
     """Predict for a batch of rows.
 
     Batching is not a nicety: one request with 500 rows is far cheaper than
-    500 requests, and the size cap on `rows` is what stops a caller using it
-    to exhaust the server.
+    500 requests, and the size cap on `rows` in PredictRequest is what stops a
+    caller using this endpoint to exhaust the server.
     """
     results = trained.predict(request.rows)
     return PredictResponse(
@@ -52,6 +52,3 @@ def predict(
         predictions=[Prediction(prediction=label, confidence=round(score, 4))
                      for label, score in results],
     )
-
-
-from ..schemas import PredictRequest  # noqa: E402  (resolves the annotation above)
