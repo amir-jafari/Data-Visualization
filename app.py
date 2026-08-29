@@ -3,10 +3,12 @@ Streamlit Course -- launcher.
 
     streamlit run app.py
 
-Pick a lesson from 01_basics/ or an app from 02_apps/ in the sidebar. The
-"Demo" tab runs it exactly as if you had run `streamlit run <that file>`
-yourself; the "Source" tab shows the code that produced it, so you can read
-and run side by side.
+Pick a lesson from 01_basics/ or an app from 02_apps/ in the sidebar. It runs
+inline, on this same page, exactly as if you had run `streamlit run <that
+file>` yourself. Switching to a different lesson/app automatically resets
+state left behind by the previous one (imported modules, st.session_state,
+GPU memory) -- see reset_between_apps() below. Use the "Clear / stop app"
+button in the sidebar to force that same reset by hand at any time.
 
 Apps in 02_apps/ need the extra requirements:
 
@@ -18,6 +20,7 @@ To run something on its own:
     streamlit run 02_apps/data_mining/classification/main.py
 """
 
+import gc
 import runpy
 import sys
 from pathlib import Path
@@ -30,6 +33,15 @@ APPS = ROOT / "02_apps"
 
 st.set_page_config(page_title="Streamlit Course", page_icon="🎈", layout="wide")
 
+# Generic names that both this course's own sibling modules (almost every
+# app has a `utils.py`) and a dynamically-loaded third-party tool can use.
+# E.g. torch.hub caches the yolov5 repo and its models/common.py does
+# `from utils import TryExcept`, expecting *its own* utils/ package -- if
+# that name is still cached from our own app's `import utils`, yolov5
+# silently gets the wrong module. Purged by name regardless of where they
+# live, unlike everything else below which is purged by file location.
+GENERIC_MODULE_NAMES = {"utils", "models", "common", "metrics", "hubconf"}
+
 
 def pretty(name):
     """'03_charts' -> 'Charts';  '05_matplotlib.py' -> 'Matplotlib';  'data_mining' -> 'Data Mining'."""
@@ -40,23 +52,51 @@ def pretty(name):
     return stem.replace("_", " ").title()
 
 
-def purge_local_modules():
-    """Drop already-imported course-local modules (utils.py, metrics.py, ...).
+def purge_stale_modules():
+    """Drop cached modules that could be silently serving the wrong file.
 
-    Many lessons/apps import a same-named sibling module (almost every app has
-    its own `utils.py`). Python caches imports in sys.modules by name, so
-    without this, the *first* app's utils.py would silently keep being served
-    to every other app that also does `import utils`. Third-party packages
-    live outside ROOT and are untouched, so their cache -- and its speed --
-    is preserved.
+    Almost every app has its own same-named `utils.py`, and Python caches
+    imports by name -- without this, the *first* app's utils.py would keep
+    being served to every other app that also does `import utils`. Two
+    targeted rules, not a blanket reset: course-local files (by location,
+    since their names vary) and a short list of generic names third-party
+    tools reuse too (by name, since they can live outside the repo -- see
+    GENERIC_MODULE_NAMES). A blanket "purge everything imported since the
+    launcher started" was tried and rejected: it also forces heavy
+    C-extension libraries like numpy to reimport on every switch, which numpy
+    itself warns can cause subtle issues -- worse than the bug it fixed.
     """
     root_str = str(ROOT)
-    for name, mod in list(sys.modules.items()):
+    for name in list(sys.modules):
         if name == "__main__":
             continue  # this launcher script itself -- runpy needs it intact
-        mod_file = getattr(mod, "__file__", None)
+        if name in GENERIC_MODULE_NAMES:
+            del sys.modules[name]
+            continue
+        mod_file = getattr(sys.modules[name], "__file__", None)
         if mod_file and mod_file.startswith(root_str):
             del sys.modules[name]
+
+
+def reset_between_apps():
+    """Clear per-demo state: st.session_state and any GPU memory it pinned.
+
+    st.session_state is one shared dict for the whole page, so a previous
+    demo's chat history, widget state, or a model it stashed in
+    st.session_state would otherwise silently persist into the next demo.
+    Also used directly by the sidebar "Clear / stop app" button.
+    """
+    for key in list(st.session_state.keys()):
+        if key != "_launcher_current_item":
+            del st.session_state[key]
+    torch = sys.modules.get("torch")
+    if torch is not None:
+        try:
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+        except Exception:
+            pass
+    gc.collect()
 
 
 @st.cache_data
@@ -107,6 +147,18 @@ else:
     )
 
 rel = item.relative_to(ROOT).as_posix()
+
+# Reset automatically when the selection actually changed since the last run.
+if st.session_state.get("_launcher_current_item") != rel:
+    reset_between_apps()
+    st.session_state["_launcher_current_item"] = rel
+
+st.sidebar.divider()
+if st.sidebar.button("🗑️ Clear / stop app", width="stretch",
+                      help="Reset this app's state (session data, GPU memory) and reload it fresh."):
+    reset_between_apps()
+    st.rerun()
+
 st.sidebar.divider()
 st.sidebar.caption("Run this one on its own:")
 st.sidebar.code(f"streamlit run {rel}", language="bash")
@@ -123,7 +175,7 @@ with demo_tab:
     # The lesson/app expects to be the main script, and some of them import a
     # sibling module (e.g. utils.py), so put its folder on sys.path first --
     # same as Streamlit does when you run the file directly.
-    purge_local_modules()
+    purge_stale_modules()
     sys.path.insert(0, str(item.parent))
     # The launcher already called st.set_page_config() once for the whole
     # page. Several apps/lessons call it again themselves (it's normally the

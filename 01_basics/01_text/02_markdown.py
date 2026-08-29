@@ -23,5 +23,3 @@ st.markdown('''{md}''')
 """)
 
 st.markdown(md)
-
-print('Amir')

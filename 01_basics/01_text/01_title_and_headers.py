@@ -1,18 +1,11 @@
 import streamlit as st
-# %%--------------------------------------------------------------------------------------------------------------------
-st.title("Streamlit App")
-st.markdown("""___""")
-st.header("Amir")
-st.subheader("header2")
-st.divider()
-# %%--------------------------------------------------------------------------------------------------------------------
-st.write('This is the place you can start writing')
-st.divider()
-# %%--------------------------------------------------------------------------------------------------------------------
-code = """df = pd.DataFrame(
-    np.random.randint(low=0, high=100, size=(10, 10)),
-    columns=('col %d' % i for i in range(10)))
 
-st.dataframe(df)"""
-st.code(code, language="python")
+st.subheader("***Title and headers***")
 
+
+# st.echo(): use in a with block to draw some code on the app, then execute it.
+with st.echo():
+    st.title("This is a title")
+    st.header("This is a header")
+    st.subheader("This is a subheader")
+    st.write("This is the place you can start writing")

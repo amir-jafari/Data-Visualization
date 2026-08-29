@@ -3,7 +3,7 @@ import numpy as np
 
 st.subheader("***Chat message***")
 
-st.write("Use with notation to insert any element into an expander")
+st.write("Use `with` notation to insert any element into a chat message")
 
 
 # st.echo(): use in a with block to draw some code on the app, then execute it.

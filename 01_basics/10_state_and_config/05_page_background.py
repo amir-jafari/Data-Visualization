@@ -22,7 +22,7 @@ with st.echo():
         background-image: url("data:image/png;base64,%s");
         background-size: cover;
         background-repeat: no-repeat;
-        background-attachment: scroll; # doesn't work
+        background-attachment: scroll;
         }
         </style>
         ''' % bin_str
