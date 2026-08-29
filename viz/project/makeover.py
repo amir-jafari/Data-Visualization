@@ -116,6 +116,15 @@ def step6(ax, full=False):
     ax.set_xlim(data["hours"].min() - 0.5, data["hours"].max() + 2.5)
 
     if full:
+        # Scores cannot exceed 100 -- you can see them piling up on that
+        # ceiling. A straight line does not know that, and happily predicts
+        # 128. Draw the ceiling so the reader can see the fit leaving reality.
+        ax.axhline(100, color="#BBBBBB", lw=1, linestyle="--", zorder=0)
+        ax.annotate("maximum possible score", xy=(data["hours"].min(), 100),
+                    xytext=(0, 4), textcoords="offset points",
+                    fontsize=8, color="#999999")
+        ax.set_ylim(top=118)
+
         # The title I first wrote here was "morning students score 9 points
         # higher at every level of study". The chart disproves it: the lines
         # are not parallel. Write the title from the picture, not from the
@@ -164,19 +173,23 @@ design = np.column_stack([np.ones(len(data)), data["hours"],
 offset = np.linalg.lstsq(design, data["score"], rcond=None)[0][2]
 morning_hours = morning["hours"].mean()
 evening_hours = evening["hours"].mean()
+_slope, _intercept = np.polyfit(morning["hours"], morning["score"], 1)
+ceiling_pred = _slope * data["hours"].max() + _intercept
 
 print(f"""
   The finding, measured: the gap runs from about {gap_low:.0f} points at low
   study hours to about {gap_high:.0f} at high. Fitting one line with a shared
   slope and a group offset instead gives {offset:+.1f} points.
 
-  Two warnings this chart earns, and neither is visible in step 1:
+  Three warnings this chart earns, none of them visible in step 1:
 
     * the fitted lines are NOT parallel, so there is no single "morning
       advantage" to quote. A title saying "X points higher" would be wrong.
     * morning students also studied more on average ({morning_hours:.1f} h vs
       {evening_hours:.1f} h), so group and hours are tangled together. This
       chart cannot separate the two.
+    * scores are capped at 100 and are piling up on that ceiling, so the
+      straight-line fits are wrong at the top -- they predict {ceiling_pred:.0f}.
 
   Step 1 contains the data. Step 6 communicates a finding -- and the job is
   not finished until the words match what the picture actually supports.

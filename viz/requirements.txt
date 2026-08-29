@@ -1,0 +1,17 @@
+# Visualization course -- everything in viz/.
+#
+#     pip install -r viz/requirements.txt
+#
+# All of these are already on the course server, so this should install
+# nothing. Unpinned on purpose: pip leaves an installed package alone unless
+# you pass -U, so running this will not move versions you already have.
+
+matplotlib
+numpy
+pandas
+seaborn                   # only for a couple of comparisons
+plotly                    # interactive/plotly_basics.py
+altair                    # interactive/altair_basics.py
+networkx                  # networks/networkx_basics.py
+pyvis                     # networks/pyvis_interactive.py
+streamlit                 # project/gallery.py

@@ -12,3 +12,6 @@ venv/
 .idea/
 .vscode/
 **/.DS_Store
+
+# rendered figures -- regenerate with `python viz/run.py --all`
+viz/output/
