@@ -71,12 +71,19 @@ def save_html(chart, source_file, name=None):
     stem = source.stem if name is None else f"{source.stem}-{name}"
     path = folder / f"{stem}.html"
 
-    if hasattr(chart, "write_html"):          # plotly
+    # Dispatch on the library, not on which methods happen to exist: plotly
+    # figures and pyvis networks BOTH have .write_html, with different
+    # signatures, so duck-typing picks the wrong one.
+    module = type(chart).__module__.split(".")[0]
+
+    if module == "plotly":
         chart.write_html(path, include_plotlyjs="cdn")
-    elif hasattr(chart, "save"):              # altair, pyvis
+    elif module == "pyvis":
+        chart.write_html(str(path), notebook=False, open_browser=False)
+    elif module == "altair":
         chart.save(str(path))
     else:
-        raise TypeError(f"Don't know how to save a {type(chart).__name__}")
+        raise TypeError(f"Don't know how to save a {module}.{type(chart).__name__}")
 
     print(f"  saved  {path.relative_to(VIZ_ROOT.parent)}   (open in a browser)")
     return path
