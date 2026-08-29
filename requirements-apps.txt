@@ -27,3 +27,15 @@ ultralytics==8.4.131      # object_detection
 
 # audio/
 librosa==0.11.0
+
+# data_mining/explainability
+shap==0.46.0
+lime==0.2.0.1          # optional -- the app runs without it, SHAP only
+
+# geospatial/
+folium==0.20.0         # pydeck already ships with streamlit
+
+# data_mining/clustering works with scikit-learn alone. Install umap-learn for
+# the third projection option -- but note that an unrelated PyPI package is
+# also called `umap` and shadows it, so the app checks before offering UMAP:
+#     pip install umap-learn
