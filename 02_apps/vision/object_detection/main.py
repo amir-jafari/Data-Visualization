@@ -42,6 +42,12 @@ def main():
         st.subheader("Step 3: Start object detection")
 
         if model_name not in st.session_state:
+            # torch.hub clones/caches the yolov5 repo and its own models/common.py
+            # does `from utils import TryExcept`, expecting *its* utils/ package.
+            # Our `import utils` above already cached this app's sibling utils.py
+            # under that same name, so without dropping it here, yolov5 would
+            # silently get our module instead of its own and fail to import.
+            sys.modules.pop("utils", None)
             # Load the YOLOv5 model
             st.session_state[model_name] = torch.hub.load(model_name, 'yolov5s', pretrained=True)
 
