@@ -15,7 +15,6 @@ nltk==3.10.0
 textblob==0.19.0
 transformers==5.14.1
 torch==2.13.0
-python-dotenv==1.0.1           # nlp/chatbot reads its AWS keys from a .env
 langchain-core==1.5.1          # nlp/chatbot/open_source_chatbot
 langchain-huggingface==1.2.2   # nlp/chatbot/open_source_chatbot
 

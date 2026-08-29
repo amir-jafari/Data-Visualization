@@ -36,15 +36,15 @@ streamlit run 02_apps/data_mining/classification/main.py
 5. **`agent_tools`** — the same, with tool calling.
 
 The last two need Bedrock credentials. They live in the same repo-root `.env`
-as the S3 keys, but under their own `bedrock_aws_*` names — a separate account
-from the S3 one:
+as the S3 keys — same field names, but under the `[bedrock]` tag, because it's
+a separate AWS account:
 
 ```bash
-cp .env.example .env      # then fill in the bedrock_aws_* block
+cp .env.example .env      # then fill in the [bedrock] block
 ```
 
-Keep the `bedrock_` prefix: pasting these under the plain `aws_*` names
-overwrites the S3 keys above them and breaks S3 *and* Bedrock at once.
+Keep both tags in the file. A key belongs to the tag above it, so the two
+accounts can't overwrite each other.
 
 Both read that one file through the shared `chatbot/bedrock.py`.
 
@@ -53,7 +53,7 @@ Both read that one file through the shared `chatbot/bedrock.py`.
 Nothing is stored in this repo. Apps marked *S3 keys* call
 `s3_utils.file_input(...)`, which gives you a picker that browses the course S3
 bucket by default and falls back to uploading your own file. Fill in the
-`aws_*` block of the repo-root `.env` first — see
+`[s3]` block of the repo-root `.env` first — see
 [`../s3/README.md`](../s3/README.md).
 
 *Downloads a model* means the first run pulls weights from HuggingFace and is

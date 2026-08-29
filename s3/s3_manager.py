@@ -17,7 +17,7 @@ accidentally touch another student's folder.
 Credentials are resolved in this order:
     1. --profile / AWS_PROFILE
     2. AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY in the environment
-    3. the repo-root .env
+    3. the [s3] block of the repo-root .env
     4. ~/.aws/credentials
     5. the IAM role attached to the EC2 instance (nothing to configure)
 """
@@ -36,9 +36,12 @@ BUCKET = "dats-dl"
 PREFIX = "ajafari@gwu.edu/"
 REGION = "us-east-1"
 
-# The one .env for the whole repo, at its root. Only its aws_* keys matter
-# here; bedrock_aws_* belong to the chatbot's LLM.
-ENV_FILE = Path(__file__).resolve().parents[1] / ".env"
+# Credentials come from the [s3] block of the one .env at the repo root. The
+# [bedrock] block beside it uses identical field names but belongs to the
+# chatbot's LLM -- the tag is what keeps the two accounts apart.
+REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT))
+from env_config import ENV_FILE, as_boto_env
 
 
 # --------------------------------------------------------------------------- #
@@ -46,22 +49,12 @@ ENV_FILE = Path(__file__).resolve().parents[1] / ".env"
 # --------------------------------------------------------------------------- #
 def load_env_file():
     """
-    Read KEY=VALUE lines from .env without needing python-dotenv.
+    Push the [s3] block into the environment under the AWS_* names boto3 reads.
 
-    Names are upper-cased on the way into the environment: the .env is written
-    in lower case (what AWS gives you), but boto3 only looks for the
-    upper-case AWS_* variables.
+    setdefault, so a real `export AWS_...` still wins over the file.
     """
-    if not ENV_FILE.is_file():
-        return
-    for line in ENV_FILE.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, value = line.split("=", 1)
-        value = value.strip().strip("'\"")
-        if value:  # a blank value would shadow a real one from the environment
-            os.environ.setdefault(key.strip().upper(), value)
+    for name, value in as_boto_env("s3").items():
+        os.environ.setdefault(name, value)
 
 
 def credential_hint(code):

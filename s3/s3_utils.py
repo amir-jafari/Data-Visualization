@@ -8,11 +8,11 @@ All data for these apps lives in S3, not on disk:
         data/         the sample datasets, mirroring the 02_apps/ tree
         CheatSheet/   streamlit_cheat_sheet.pdf
 
-Credentials are read from the repo-root .env (the same file s3_manager.py uses),
-so when the Learner Lab keys expire you only update that one file. S3 uses the
-AWS_* keys there; the BEDROCK_AWS_* keys in the same file are for the chatbot's
-LLM and are untouched here. Real environment variables and ~/.aws/credentials
-still win if they are set.
+Credentials are read from the [s3] block of the repo-root .env (the same file
+s3_manager.py uses), so when the Learner Lab keys expire you only update that
+one file. The [bedrock] block beside it uses the same field names but is the
+chatbot's LLM account, and is untouched here. Real environment variables and
+~/.aws/credentials still win if they are set.
 
 Typical use inside an app:
 
@@ -25,6 +25,7 @@ Typical use inside an app:
 
 import io
 import os
+import sys
 from pathlib import Path
 
 import boto3
@@ -43,17 +44,16 @@ CRED_KEYS = (
     "AWS_DEFAULT_REGION",
 )
 
-# The one .env for the whole repo, at its root. Deliberately the only place we
-# look: a leftover s3/.env with stale keys used to win silently and was very
-# hard to diagnose. S3 uses the aws_* keys there; the bedrock_aws_* ones next
-# to them belong to the chatbot's LLM.
-_HERE = Path(__file__).resolve().parent
-ENV_CANDIDATES = (_HERE.parent / ".env",)
+# Credentials come from the [s3] block of the one .env at the repo root. The
+# [bedrock] block beside it uses identical field names but belongs to the
+# chatbot's LLM -- the tag is what keeps the two accounts apart.
+REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT))
+from env_config import ENV_FILE, as_boto_env
 
 # Whatever was already in the real environment when this module was imported
 # takes precedence over the .env file, so `export AWS_...` still works.
-# Checked in both cases, since the .env spells these in lower case.
-_REAL_ENV = {k: os.environ.get(k) or os.environ.get(k.lower()) for k in CRED_KEYS}
+_REAL_ENV = {k: os.environ.get(k) for k in CRED_KEYS}
 
 
 # --------------------------------------------------------------------------- #
@@ -61,36 +61,17 @@ _REAL_ENV = {k: os.environ.get(k) or os.environ.get(k.lower()) for k in CRED_KEY
 # --------------------------------------------------------------------------- #
 def env_file():
     """The .env we are actually using, or None if there isn't one."""
-    return next((p for p in ENV_CANDIDATES if p.is_file()), None)
-
-
-def _read_env_file(path):
-    """
-    KEY=VALUE pairs from a .env, with names upper-cased.
-
-    The .env is written in lower case, matching what AWS hands you, but boto3
-    only reads the upper-case AWS_* variables out of the environment -- so
-    normalise here and either spelling in the file works.
-    """
-    values = {}
-    for line in path.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, value = line.split("=", 1)
-        values[key.strip().upper()] = value.strip().strip("'\"")
-    return values
+    return ENV_FILE if ENV_FILE.is_file() else None
 
 
 def load_credentials():
     """
-    Push the current .env values into os.environ and return a fingerprint.
+    Push the [s3] block into os.environ and return a fingerprint.
 
     Re-read every run rather than cached, so pasting fresh keys into .env and
     hitting "Rerun" is enough to pick them up -- no restart required.
     """
-    path = env_file()
-    file_values = _read_env_file(path) if path else {}
+    file_values = as_boto_env("s3")
 
     for key in CRED_KEYS:
         real = _REAL_ENV.get(key)
@@ -161,8 +142,7 @@ def is_credential_problem(exc):
 def show_error(exc, key=None):
     """Render a readable failure box. Credential problems get the loud version."""
     code = error_code(exc)
-    path = env_file()
-    location = str(path) if path else " / ".join(str(p) for p in ENV_CANDIDATES)
+    location = str(ENV_FILE)
 
     if is_credential_problem(exc):
         st.error(
@@ -172,9 +152,11 @@ def show_error(exc, key=None):
             f"**{_HINTS.get(code, 'The credentials are not being accepted.')}**\n\n"
             f"**To fix it:**\n"
             f"1. Start your AWS lab again and copy the fresh credentials.\n"
-            f"2. Paste them into `{location}`:\n"
-            f"   `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and "
-            f"`AWS_SESSION_TOKEN` (required for keys that start with `ASIA`).\n"
+            f"2. Paste them into the **`[s3]`** block of `{location}`:\n"
+            f"   `aws_access_key_id`, `aws_secret_access_key`, and "
+            f"`aws_session_token` (required for keys that start with `ASIA`).\n"
+            f"   Leave the `[bedrock]` block below it alone -- it is a "
+            f"different account.\n"
             f"3. Come back here and press the button below.\n"
         )
         if st.button(":arrows_counterclockwise: I updated the keys -- retry",

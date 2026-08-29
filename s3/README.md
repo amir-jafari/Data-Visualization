@@ -20,12 +20,23 @@ cp .env.example .env      # then paste your keys into .env at the repo root
 ```
 
 One `.env` at the repo root serves everything — it is the only place the code
-looks. It holds two independent credential sets from two different accounts:
-the `aws_*` keys used here for S3, and the `bedrock_aws_*` keys the chatbot
-demos use for the LLM. Filling in only the `aws_*` block is enough for S3.
+looks. It holds two credential sets from two different AWS accounts, using the
+same field names and told apart by the `[tag]` above each block:
 
-> Keep the `bedrock_` prefix on the second set. Pasting it under the plain
-> `aws_*` names overwrites the S3 keys further up the file and breaks both.
+```ini
+[s3]
+region=us-east-1
+aws_access_key_id=ASIA...
+aws_secret_access_key=...
+aws_session_token=...
+
+[bedrock]
+...
+```
+
+That's the same layout the AWS console gives you, so you can paste a block
+straight in without renaming anything, and one set can't overwrite the other.
+Filling in only `[s3]` is enough for everything here.
 
 `.env` is git-ignored. Real environment variables and `~/.aws/credentials`
 override it if you'd rather use those.
@@ -40,9 +51,9 @@ Learner Lab credentials are temporary. When they die, any app that reads from
 S3 stops and shows a **"AWS keys need to be updated"** panel:
 
 1. Restart your AWS lab and copy the fresh credentials.
-2. Paste `aws_access_key_id`, `aws_secret_access_key` and `aws_session_token`
-   into the repo-root `.env` (the session token is **required** for keys
-   starting `ASIA`).
+2. Paste them into the **`[s3]`** block of the repo-root `.env` — the session
+   token is **required** for keys starting `ASIA`. Leave `[bedrock]` alone;
+   it's a different account.
 3. Press the retry button in the app — no restart needed.
 
 ## Using it in your own code

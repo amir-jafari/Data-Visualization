@@ -83,8 +83,8 @@ cp .env.example .env      # then paste your keys into .env at the repo root
 ```
 
 If an app shows a **"AWS keys need to be updated"** panel, your Learner Lab
-session expired: restart the lab, paste the fresh `aws_*` keys into the
-repo-root `.env`, and press
+session expired: restart the lab, paste the fresh keys into the `[s3]` block
+of the repo-root `.env`, and press
 the retry button in the app. No restart needed. Full details in
 [`s3/README.md`](s3/README.md).
 
