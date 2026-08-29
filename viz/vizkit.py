@@ -59,6 +59,29 @@ def save(fig, source_file, name=None, dpi=110, crop=True):
     return path
 
 
+def save_html(chart, source_file, name=None):
+    """Same idea as save(), for things that are HTML rather than pixels.
+
+    Plotly figures, Altair charts and PyVis networks are interactive, so a PNG
+    would throw away the point of them. Open the saved file in a browser.
+    """
+    source = Path(source_file).resolve()
+    folder = OUTPUT / source.parent.name
+    folder.mkdir(parents=True, exist_ok=True)
+    stem = source.stem if name is None else f"{source.stem}-{name}"
+    path = folder / f"{stem}.html"
+
+    if hasattr(chart, "write_html"):          # plotly
+        chart.write_html(path, include_plotlyjs="cdn")
+    elif hasattr(chart, "save"):              # altair, pyvis
+        chart.save(str(path))
+    else:
+        raise TypeError(f"Don't know how to save a {type(chart).__name__}")
+
+    print(f"  saved  {path.relative_to(VIZ_ROOT.parent)}   (open in a browser)")
+    return path
+
+
 # --------------------------------------------------------------------------- #
 # sample data -- seeded, so the figures never change under you
 # --------------------------------------------------------------------------- #
