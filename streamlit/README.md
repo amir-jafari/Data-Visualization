@@ -50,7 +50,7 @@ to read in a minute. Open one, run it, break something, run it again — that
 loop is the point.
 
 ```bash
-streamlit run streamlit/basics/charts/matplotlib.py
+streamlit run streamlit/basics/charts/matplotlib_chart.py
 ```
 
 **2. Notice `with st.echo():`.** Most lessons wrap their body in it, so the app

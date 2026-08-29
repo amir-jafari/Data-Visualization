@@ -16,7 +16,7 @@ Apps in apps/ need the extra requirements:
 
 To run something on its own:
 
-    streamlit run streamlit/basics/charts/matplotlib.py
+    streamlit run streamlit/basics/charts/matplotlib_chart.py
     streamlit run streamlit/apps/data_mining/classification/main.py
 """
 
@@ -44,14 +44,14 @@ CHAPTER_ORDER = [
 ]
 
 LESSON_ORDER = {
-    "text": ["title_and_headers", "markdown", "latex"],
+    "text": ["title_and_headers", "markdown_text", "latex"],
     "dataframes": [
         "display_dataframe", "styling", "interactive_table", "data_editor",
-        "column_config", "metrics", "json",
+        "column_config", "metrics", "display_json",
     ],
     "charts": [
-        "line_chart", "area_chart", "bar_chart", "scatter_chart", "matplotlib",
-        "altair", "vega_lite", "plotly", "map",
+        "line_chart", "area_chart", "bar_chart", "scatter_chart", "matplotlib_chart",
+        "altair_chart", "vega_lite", "plotly_chart", "map",
     ],
     "inputs": [
         "button", "download_button", "checkbox", "toggle", "radio", "selectbox",
@@ -227,7 +227,16 @@ with demo_tab:
     # sibling module (e.g. utils.py), so put its folder on sys.path first --
     # same as Streamlit does when you run the file directly.
     purge_stale_modules()
-    sys.path.insert(0, str(item.parent))
+
+    # Apps import their sibling utils.py, so their folder has to be importable.
+    # Lessons never import a sibling, and putting their folder on sys.path is
+    # actively dangerous: a lesson called altair.py or json.py would then shadow
+    # the real library for anything imported afterwards -- including Streamlit's
+    # own `import altair` inside st.line_chart(). Lesson filenames avoid those
+    # names too (see basics/README.md), but there is no reason to take the risk.
+    needs_sys_path = item.parent != BASICS and BASICS not in item.parents
+    if needs_sys_path:
+        sys.path.insert(0, str(item.parent))
     # The launcher already called st.set_page_config() once for the whole
     # page. Several apps/lessons call it again themselves (it's normally the
     # first line of their script) -- Streamlit only allows one call per page
@@ -248,4 +257,5 @@ with demo_tab:
         st.exception(exc)
     finally:
         st.set_page_config = real_set_page_config
-        sys.path.remove(str(item.parent))
+        if needs_sys_path:
+            sys.path.remove(str(item.parent))
