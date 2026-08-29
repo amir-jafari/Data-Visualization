@@ -1,0 +1,20 @@
+# FastAPI course -- everything in fastapi/.
+#
+#     pip install -r fastapi/requirements.txt
+#
+# Versions match the course server where it already has the package. FastAPI
+# itself is NOT currently installed there, so this is the one that matters.
+
+fastapi==0.115.6
+uvicorn[standard]==0.40.0     # the web server that actually listens on the port
+pydantic==2.12.5              # already present -- validation and models
+pydantic-settings==2.14.2     # already present -- settings from the environment
+python-multipart==0.0.32      # already present -- needed for file uploads and forms
+httpx==0.28.1                 # already present -- used by TestClient
+
+# The capstone project in project/ additionally uses:
+pandas
+scikit-learn                  # the model, and the built-in fallback datasets
+boto3                         # optional -- serves the course S3 datasets when keys work
+requests                      # the Streamlit client calls the API with it
+streamlit                     # the client page itself
