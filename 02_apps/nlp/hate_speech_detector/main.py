@@ -1,6 +1,24 @@
+"""
+Hate speech detector -- classify a piece of text as hateful or not.
+
+What it shows:
+    * the smallest useful shape for a text-classification app: text in, label out
+    * @st.cache_resource, so the model is downloaded once and not on every rerun
+
+Model: picked in the sidebar.
+
+    streamlit run 02_apps/nlp/hate_speech_detector/main.py
+"""
+
 import streamlit as st
 import utils
 from transformers import pipeline
+
+
+@st.cache_resource(show_spinner="Loading the model...")
+def load_pipeline(model_name):
+    """Load once and reuse. Keyed on model_name, so switching models reloads."""
+    return pipeline("text-classification", model=model_name)
 
 
 def main():
@@ -23,10 +41,8 @@ def main():
         st.divider()
         st.subheader("Step 3: Detect if it's hate speech")
 
-        hate_speech_detector = pipeline("text-classification", model=model_name)
-
-        # Perform hate speech detection
-        result = hate_speech_detector(txt)[0]
+        detector = load_pipeline(model_name)
+        result = detector(txt)[0]
         st.write(f"The label of the result is **{result['label']}**, and the score is **{result['score']:.2f}**")
 
 

@@ -1,47 +1,60 @@
-# Reference: https://docs.streamlit.io/knowledge-base/tutorials/build-conversational-apps
-# https://blog.streamlit.io/how-to-build-a-llama-2-chatbot/
-# https://blog.streamlit.io/how-to-build-an-llm-powered-chatbot-with-streamlit/
+"""
+Dummy chatbot -- the echo bot plus a typing effect and canned replies.
+
+What it shows:
+    * st.empty() as a placeholder you overwrite repeatedly, which is how the
+      word-by-word "typing" animation works underneath
+    * still no model: the reply is picked at random from a list
+
+The next demo up (open_source_chatbot) does the same effect with
+st.write_stream(), the shortcut for exactly this pattern -- see
+01_basics/07_chat/03_write_stream.py.
+
+Reference: https://docs.streamlit.io/knowledge-base/tutorials/build-conversational-apps
+
+    streamlit run 02_apps/nlp/chatbot/dummy_chat_bot/main.py
+"""
 
 import streamlit as st
 import random
 import time
 
-st.title("Simple chat")
+REPLIES = [
+    "Hello there! How can I assist you today?",
+    "Hi, human! Is there anything I can help you with?",
+    "Do you need help?",
+]
 
-# Initialize chat history
-if "messages" not in st.session_state:
-    st.session_state.messages = []
 
-# Display chat messages from history on app rerun
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+def main():
+    st.title("Simple chat")
 
-# Accept user input
-if prompt := st.chat_input("What is up?"):
-    # Add user message to chat history
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    # Display user message in chat message container
-    with st.chat_message("user"):
-        st.markdown(prompt)
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
 
-    # Display assistant response in chat message container
-    with st.chat_message("assistant"):
-        message_placeholder = st.empty()
-        full_response = ""
-        assistant_response = random.choice(
-            [
-                "Hello there! How can I assist you today?",
-                "Hi, human! Is there anything I can help you with?",
-                "Do you need help?",
-            ]
-        )
-        # Simulate stream of response with milliseconds delay
-        for chunk in assistant_response.split():
-            full_response += chunk + " "
-            time.sleep(0.05)
-            # Add a blinking cursor to simulate typing
-            message_placeholder.markdown(full_response + "▌")
-        message_placeholder.markdown(full_response)
-    # Add assistant response to chat history
-    st.session_state.messages.append({"role": "assistant", "content": full_response})
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    if prompt := st.chat_input("What is up?"):
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.markdown(prompt)
+
+        with st.chat_message("assistant"):
+            # One placeholder, overwritten once per word -- that is the whole trick.
+            message_placeholder = st.empty()
+            full_response = ""
+
+            for chunk in random.choice(REPLIES).split():
+                full_response += chunk + " "
+                time.sleep(0.05)
+                message_placeholder.markdown(full_response + "▌")   # ▌ = fake cursor
+
+            message_placeholder.markdown(full_response)
+
+        st.session_state.messages.append({"role": "assistant", "content": full_response})
+
+
+if __name__ == "__main__":
+    main()

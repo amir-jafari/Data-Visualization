@@ -1,3 +1,16 @@
+"""
+Audio transcription -- turn speech in an audio file into text.
+
+What it shows:
+    * resampling with librosa so the audio matches what the model was trained on
+    * a CTC model decoded by hand: logits -> argmax -> batch_decode
+    * @st.cache_resource, so the model is downloaded once and not on every rerun
+
+Model: facebook/wav2vec2-base-960h and friends -- picked in the sidebar.
+
+    streamlit run 02_apps/audio/transcription/main.py
+"""
+
 import streamlit as st
 
 from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
@@ -17,6 +30,13 @@ from s3 import s3_utils
 #   s3://dats-dl/ajafari@gwu.edu/streamlit/data/Audio/
 S3_FOLDER = "data/Audio"
 
+
+@st.cache_resource(show_spinner="Loading the model...")
+def load_model(model_name):
+    """Load once and reuse. Keyed on model_name, so switching models reloads."""
+    processor = Wav2Vec2Processor.from_pretrained(model_name)
+    model = Wav2Vec2ForCTC.from_pretrained(model_name)
+    return processor, model
 
 
 def main():
@@ -47,21 +67,14 @@ def main():
         st.divider()
         st.subheader("Step 3: Get the transcription of the audio")
 
-        # load model and tokenizer
-        if 'processor' not in st.session_state:
-            st.session_state['processor'] = Wav2Vec2Processor.from_pretrained(model_name)
-        if 'model' not in st.session_state:
-            st.session_state['model'] = Wav2Vec2ForCTC.from_pretrained(model_name)
+        processor, model = load_model(model_name)
 
-        # tokenize
-        input_values = st.session_state['processor'](y, sampling_rate=sr, return_tensors="pt", padding="longest").input_values  # Batch size 1
-
-        # retrieve logits
-        logits = st.session_state['model'](input_values).logits
-
-        # take argmax and decode
+        # tokenize -> logits -> most likely character at each step -> text
+        input_values = processor(y, sampling_rate=sr, return_tensors="pt",
+                                 padding="longest").input_values
+        logits = model(input_values).logits
         predicted_ids = torch.argmax(logits, dim=-1)
-        transcription = st.session_state['processor'].batch_decode(predicted_ids)
+        transcription = processor.batch_decode(predicted_ids)
 
         st.write("***The transcription is as follows***")
         st.write(transcription[0])

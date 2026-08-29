@@ -1,3 +1,20 @@
+"""
+Classification -- train and compare six classifiers on your own CSV.
+
+What it shows:
+    * the full tabular workflow in five visible steps: load -> preprocess ->
+      explore -> choose a model -> read the result
+    * label encoding, dropping columns, handling nulls, train/test split
+    * accuracy, a classification report and a confusion matrix side by side
+
+Models: decision tree, random forest, SVM, KNN, naive Bayes, logistic
+regression -- picked in the sidebar, each with its own hyperparameters.
+
+Data: browsed from S3 (data/data_mining/classification), or upload your own.
+
+    streamlit run 02_apps/data_mining/classification/main.py
+"""
+
 import io
 import streamlit as st
 import pandas as pd
@@ -9,7 +26,14 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 
 import warnings
-warnings.filterwarnings("ignore")
+from sklearn.exceptions import ConvergenceWarning, UndefinedMetricWarning
+
+# Two warnings are expected here and would only confuse students: a model that
+# hit its iteration cap (common with default settings on raw data), and a
+# classification report for a class the model never predicted. Silence *those
+# two* -- a blanket filterwarnings("ignore") would also hide real problems.
+warnings.filterwarnings("ignore", category=ConvergenceWarning)
+warnings.filterwarnings("ignore", category=UndefinedMetricWarning)
 
 import utils
 
@@ -121,14 +145,6 @@ def main():
                 ax.set_title('Boxplot of numerical_column')
                 st.pyplot(fig)
 
-                # # Histogram for a numerical column
-                # plt.figure(figsize=(8, 6))
-                # sns.histplot(data[plot_column], kde=True)
-                # plt.title('Distribution of numerical_column')
-                # plt.xlabel('Value')
-                # plt.ylabel('Frequency')
-                # st.pyplot(plt)
-
             with col2:
                 # Bar chart for a categorical column
                 fig, ax = plt.subplots()
@@ -177,8 +193,6 @@ def main():
     st.text('Classification Report:\n' + classification_report(y_test, y_pred))
 
     conf_matrix = confusion_matrix(y_test, y_pred)
-
-    # st.write(type(conf_matrix))
     class_names = data[y_column].unique()
     df_cm = pd.DataFrame(conf_matrix, index=class_names, columns=class_names)
 

@@ -1,4 +1,17 @@
-# Reference: https://blog.streamlit.io/build-an-image-background-remover-in-streamlit/
+"""
+Background remover -- cut the subject out of a photo.
+
+What it shows:
+    * a one-call model (rembg) wrapped in a before/after layout
+    * st.columns for side-by-side comparison, and a download button for the result
+
+The smallest app in the folder -- a good template to copy for any
+"upload an image, transform it, show it" project.
+
+Reference: https://blog.streamlit.io/build-an-image-background-remover-in-streamlit/
+
+    streamlit run 02_apps/vision/background_remover/main.py
+"""
 
 import streamlit as st
 import utils

@@ -1,3 +1,17 @@
+"""
+Text cleaning -- the preprocessing every NLP project starts with.
+
+What it shows:
+    * each step applied one at a time so you can see what it removes:
+      lowercasing, punctuation, stopwords, stemming, lemmatising
+    * why order matters, and what you lose at each stage
+
+Run this before sentiment_analysis/ or text_classification/ -- it is the step
+those two assume you already understand.
+
+    streamlit run 02_apps/nlp/text_cleaning/main.py
+"""
+
 import streamlit as st
 import utils
 

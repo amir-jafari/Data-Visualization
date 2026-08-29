@@ -1,3 +1,5 @@
+import warnings
+
 import streamlit as st
 import numpy as np
 import pandas as pd
@@ -8,6 +10,7 @@ from tqdm import tqdm
 from statsmodels.tsa.ar_model import AutoReg
 from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.statespace.sarimax import SARIMAX
+from statsmodels.tools.sm_exceptions import ConvergenceWarning, ValueWarning
 
 from metrics import evaluate
 
@@ -22,10 +25,12 @@ from s3 import s3_utils
 #   s3://dats-dl/ajafari@gwu.edu/streamlit/data/time_series/forecasting/
 S3_FOLDER = "data/time_series/forecasting"
 
-
-
-import warnings
-warnings.filterwarnings("ignore")
+# statsmodels is chatty about two things that are expected here: a fitted model
+# that stopped before fully converging, and a series with no explicit date
+# frequency. Silence *those two*, scoped to this module -- a blanket
+# filterwarnings("ignore") would also hide real deprecations and bugs.
+warnings.filterwarnings("ignore", category=ConvergenceWarning)
+warnings.filterwarnings("ignore", category=ValueWarning)
 
 
 def sidebar(options):

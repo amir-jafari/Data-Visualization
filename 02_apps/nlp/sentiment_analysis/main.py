@@ -1,3 +1,16 @@
+"""
+Sentiment analysis -- is this text positive, negative or neutral?
+
+What it shows:
+    * the two classic rule-based scorers side by side, no training required:
+      TextBlob (polarity/subjectivity) and VADER (tuned for social media)
+    * how much you can do before reaching for a neural model
+
+Model: picked in the sidebar. Nothing is downloaded -- both are lexicon-based.
+
+    streamlit run 02_apps/nlp/sentiment_analysis/main.py
+"""
+
 import streamlit as st
 import utils
 

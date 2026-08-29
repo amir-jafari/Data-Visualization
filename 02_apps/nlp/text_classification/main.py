@@ -1,6 +1,22 @@
+"""
+Text classification -- train your own classifier on labelled text.
+
+What it shows:
+    * turning words into numbers with a bag-of-words / TF-IDF vectoriser
+    * an sklearn Pipeline, so the vectoriser and the model are fitted together
+    * naive Bayes vs logistic regression on the same data
+    * f1, a classification report and a confusion matrix
+
+Unlike the other NLP demos this one *trains* -- nothing is pretrained.
+
+Data: browsed from S3, or upload your own labelled CSV.
+
+    streamlit run 02_apps/nlp/text_classification/main.py
+"""
+
 import streamlit as st
 
-from sklearn import feature_extraction,  naive_bayes, pipeline
+from sklearn import feature_extraction, naive_bayes, pipeline
 from sklearn.metrics import classification_report, confusion_matrix, f1_score
 from sklearn.linear_model import LogisticRegression
 

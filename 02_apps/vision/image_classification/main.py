@@ -1,6 +1,16 @@
-# https://huggingface.co/google/vit-base-patch16-224
+"""
+Image classification -- label a picture with a pretrained vision model.
 
-# from transformers import ViTImageProcessor, ViTForImageClassification
+What it shows:
+    * a picture chosen from S3 (or uploaded) fed straight to a Transformers pipeline
+    * @st.cache_resource, so the model is downloaded once and not on every rerun
+
+Model: google/vit-base-patch16-224 and friends -- picked in the sidebar.
+Reference: https://huggingface.co/google/vit-base-patch16-224
+
+    streamlit run 02_apps/vision/image_classification/main.py
+"""
+
 from PIL import Image
 import streamlit as st
 from transformers import pipeline
@@ -17,6 +27,12 @@ from s3 import s3_utils
 # All data for this app lives in S3, never on disk:
 #   s3://dats-dl/ajafari@gwu.edu/streamlit/data/computer_vision/
 S3_FOLDER = "data/computer_vision"
+
+
+@st.cache_resource(show_spinner="Loading the model...")
+def load_pipeline(model_name):
+    """Load once and reuse. Keyed on model_name, so switching models reloads."""
+    return pipeline("image-classification", model=model_name)
 
 
 def main():
@@ -46,11 +62,8 @@ def main():
     st.divider()
     st.subheader("Step 3: Predict the image")
 
-    if 'pipe' not in st.session_state:
-        st.session_state['pipe'] = pipeline("image-classification", model=model_name)
-
-    # classification_pipeline = pipeline("image-classification", model=model_name)
-    result = st.session_state['pipe'](image)
+    classifier = load_pipeline(model_name)
+    result = classifier(image)
 
     st.write(f"Predicted class: {result[0]['label']}")
 

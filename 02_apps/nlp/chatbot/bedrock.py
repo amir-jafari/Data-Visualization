@@ -70,3 +70,27 @@ def invoke_llm_api(prompt, conversation_history=None, max_tokens=1000, temperatu
         return None
     except Exception:
         return None
+
+
+# %% ----- Convenience wrapper
+def ask_llm(prompt, conversation_history=None, **kwargs):
+    """invoke_llm_api(), unwrapped to plain text.
+
+    The raw call returns Bedrock's JSON envelope (or None if the request
+    failed). Every chat demo wants the same thing out of it -- the assistant's
+    text, or a sentence explaining why there isn't any -- so that unwrapping
+    lives here once instead of being copied into each app.
+    """
+    try:
+        response_str = invoke_llm_api(prompt, conversation_history, **kwargs)
+
+        if not response_str:
+            return "Sorry, I couldn't get a response from the AI. Please try again."
+
+        body = json.loads(response_str)
+        if "content" in body:
+            return body["content"][0]["text"]
+        return "Sorry, I couldn't understand the response from the AI."
+
+    except Exception as exc:
+        return f"Sorry, I encountered an error: {exc}"

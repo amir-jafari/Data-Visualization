@@ -1,3 +1,5 @@
+import warnings
+
 import streamlit as st
 import pandas as pd
 import seaborn as sns
@@ -9,6 +11,7 @@ from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.linear_model import LogisticRegression
+from sklearn.exceptions import ConvergenceWarning
 
 # --- make the repo's s3/ helpers importable, wherever you run this from ------
 import sys
@@ -21,9 +24,10 @@ from s3 import s3_utils
 #   s3://dats-dl/ajafari@gwu.edu/streamlit/data/data_mining/classification/
 S3_FOLDER = "data/data_mining/classification"
 
-
-import warnings
-warnings.filterwarnings("ignore")
+# Models fitted with default settings often hit their iteration cap on raw
+# student data. That one warning is expected and only confuses; silence it and
+# nothing else -- a blanket filterwarnings("ignore") would hide real problems.
+warnings.filterwarnings("ignore", category=ConvergenceWarning)
 
 
 def sidebar(options):

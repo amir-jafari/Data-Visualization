@@ -1,3 +1,15 @@
+"""
+Object detection -- draw boxes around everything YOLOv5 recognises in a picture.
+
+What it shows:
+    * torch.hub loading a model straight from a GitHub repo
+    * @st.cache_resource, so the weights are fetched once per model
+
+Model: ultralytics/yolov5 (yolov5s) -- picked in the sidebar.
+
+    streamlit run 02_apps/vision/object_detection/main.py
+"""
+
 import torch
 import streamlit as st
 from PIL import Image
@@ -15,6 +27,17 @@ from s3 import s3_utils
 #   s3://dats-dl/ajafari@gwu.edu/streamlit/data/computer_vision/object_detection/
 S3_FOLDER = "data/computer_vision/object_detection"
 
+
+@st.cache_resource(show_spinner="Loading the model...")
+def load_model(model_name):
+    """Load once and reuse. Keyed on model_name, so switching models reloads."""
+    # torch.hub clones/caches the yolov5 repo and its own models/common.py does
+    # `from utils import TryExcept`, expecting *its* utils/ package. Our
+    # `import utils` above already cached this app's sibling utils.py under that
+    # same name, so without dropping it here yolov5 would silently get our
+    # module instead of its own and fail to import.
+    sys.modules.pop("utils", None)
+    return torch.hub.load(model_name, 'yolov5s', pretrained=True)
 
 
 def main():
@@ -41,23 +64,11 @@ def main():
         st.divider()
         st.subheader("Step 3: Start object detection")
 
-        if model_name not in st.session_state:
-            # torch.hub clones/caches the yolov5 repo and its own models/common.py
-            # does `from utils import TryExcept`, expecting *its* utils/ package.
-            # Our `import utils` above already cached this app's sibling utils.py
-            # under that same name, so without dropping it here, yolov5 would
-            # silently get our module instead of its own and fail to import.
-            sys.modules.pop("utils", None)
-            # Load the YOLOv5 model
-            st.session_state[model_name] = torch.hub.load(model_name, 'yolov5s', pretrained=True)
+        model = load_model(model_name)
+        results = model(image)
 
-        results = st.session_state[model_name](image)
-
-        results_img = results.render()[0]  # This is a PIL Image
-        results_img_pil = Image.fromarray(results_img)
-
-        # Use Streamlit to write the image to the webpage
-        st.image(results_img_pil, caption='Detected Objects', width="stretch")
+        results_img = Image.fromarray(results.render()[0])
+        st.image(results_img, caption='Detected Objects', width="stretch")
 
 
 if __name__ == "__main__":

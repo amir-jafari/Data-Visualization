@@ -1,3 +1,20 @@
+"""
+Audio processing -- what a sound file looks like, in five different views.
+
+What it shows:
+    * waveform, harmonic/percussive separation and envelopes
+    * spectrograms and chroma features -- audio as an image
+    * NMF decomposition into components, and self-similarity matrices
+    * tempo/beat tracking and segmentation
+
+The signal-processing companion to transcription/: this one never asks what
+the audio *says*, only what it looks like.
+
+Data: browsed from S3 (data/Audio), or upload your own.
+
+    streamlit run 02_apps/audio/audio_processing/main.py
+"""
+
 import math
 import warnings
 

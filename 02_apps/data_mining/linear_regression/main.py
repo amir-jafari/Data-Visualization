@@ -1,3 +1,18 @@
+"""
+Linear regression -- fit a line, and see what the diagnostics mean.
+
+What it shows:
+    * you generate the data yourself (normal / uniform / gamma), so you know
+      the true relationship and can watch the model recover it
+    * sklearn for the fit, statsmodels for the full summary table
+    * residual plots and MSE -- how you tell a good fit from a bad one
+
+Nothing is loaded: the data is simulated, so this app needs no keys at all.
+A good first read before classification/.
+
+    streamlit run 02_apps/data_mining/linear_regression/main.py
+"""
+
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt

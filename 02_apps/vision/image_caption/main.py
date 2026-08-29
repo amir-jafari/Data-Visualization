@@ -1,5 +1,15 @@
-# https://medium.com/@sirikrrishna99/automatic-image-captioning-using-streamlit-and-hugging-face-transformers-d3563edb5457
-# https://huggingface.co/docs/transformers/main/tasks/image_captioning
+"""
+Image captioning -- write a sentence describing a picture.
+
+What it shows:
+    * an encoder-decoder model driven piece by piece (processor -> model -> tokenizer)
+    * @st.cache_resource holding all three pieces as one bundle
+
+Model: ydshieh/vit-gpt2-coco-en and friends -- picked in the sidebar.
+Reference: https://huggingface.co/docs/transformers/main/tasks/image_captioning
+
+    streamlit run 02_apps/vision/image_caption/main.py
+"""
 
 import streamlit as st
 from transformers import AutoModelForImageTextToText, AutoImageProcessor, AutoTokenizer
@@ -18,6 +28,21 @@ from s3 import s3_utils
 #   s3://dats-dl/ajafari@gwu.edu/streamlit/data/computer_vision/
 S3_FOLDER = "data/computer_vision"
 
+
+@st.cache_resource(show_spinner="Loading the model...")
+def load_bundle(model_name):
+    """Load once and reuse. Keyed on model_name, so switching models reloads.
+
+    transformers 5.x removed the "image-to-text" pipeline task, and the
+    replacement "image-text-to-text" pipeline requires a bundled AutoProcessor,
+    which older captioning checkpoints like ydshieh/vit-gpt2-coco-en don't ship.
+    Load the pieces directly instead, which works either way.
+    """
+    return {
+        "model": AutoModelForImageTextToText.from_pretrained(model_name),
+        "image_processor": AutoImageProcessor.from_pretrained(model_name),
+        "tokenizer": AutoTokenizer.from_pretrained(model_name),
+    }
 
 
 def main():
@@ -44,19 +69,7 @@ def main():
         st.divider()
         st.subheader("Step 3: Get the caption of the image")
 
-        if model_name not in st.session_state:
-            # transformers 5.x removed the "image-to-text" pipeline task, and the
-            # replacement "image-text-to-text" pipeline requires a bundled
-            # AutoProcessor, which older captioning checkpoints like
-            # ydshieh/vit-gpt2-coco-en don't ship. Load the pieces directly instead,
-            # which works whether or not the repo has a combined processor.
-            st.session_state[model_name] = {
-                "model": AutoModelForImageTextToText.from_pretrained(model_name),
-                "image_processor": AutoImageProcessor.from_pretrained(model_name),
-                "tokenizer": AutoTokenizer.from_pretrained(model_name),
-            }
-
-        bundle = st.session_state[model_name]
+        bundle = load_bundle(model_name)
         pixel_values = bundle["image_processor"](images=image, return_tensors="pt").pixel_values
         output_ids = bundle["model"].generate(pixel_values, max_new_tokens=50)
         caption = bundle["tokenizer"].decode(output_ids[0], skip_special_tokens=True)

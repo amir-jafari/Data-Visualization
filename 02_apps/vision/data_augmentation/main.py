@@ -1,4 +1,15 @@
-# https://albumentations.ai/docs/
+"""
+Data augmentation -- the transforms used to grow an image training set.
+
+What it shows:
+    * each Albumentations transform applied live, with its parameters on sliders
+    * why augmentation matters: one photo becomes many training examples
+    * @st.cache_data, so the source image is not re-read on every slider move
+
+Reference: https://albumentations.ai/docs/
+
+    streamlit run 02_apps/vision/data_augmentation/main.py
+"""
 
 import streamlit as st
 import numpy as np

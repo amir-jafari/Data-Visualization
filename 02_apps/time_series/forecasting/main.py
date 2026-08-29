@@ -1,20 +1,21 @@
-# auto regressive model, run AI, ARIMA model.
+"""
+Time-series forecasting -- fit a classical model to a series and predict ahead.
 
-# And these models are available in the stats model. Okay, just one line. Yes. And you will get the predictions, okay. And you have the code for the predictions in basic plots, and then auto correlation and partial correlation. So this is called autocorrelation auto CFN. pcf.
+What it shows:
+    * stationarity: the ADF test, differencing, and seasonal decomposition
+    * ACF/PACF plots, which are how you *choose* the model's orders
+    * the family of models, each adding one idea to the last:
 
-# So I just use you pass this series and show the autocorrelation function, okay. And, for this one, generate random numbers. So you can generate for example, normal distribution or pass or someone upload the data so give them option.
+        AR    -- today is a linear combination of previous values
+        MA    -- today is a linear combination of previous *errors*
+        ARMA  -- both of the above
+        ARIMA -- ARMA plus differencing, for a series that drifts
+        SARIMA-- ARIMA plus a seasonal cycle
 
-'''
-AR (Autoregressive Model): Models the current value as a linear combination of its previous values.
+Data: browsed from S3 (data/time_series/forecasting), or generated, or uploaded.
 
-MA (Moving Average Model): Models the current value as a linear combination of the current and past error terms.
-
-ARMA (Autoregressive Moving Average Model): Combines both AR and MA models.
-
-ARIMA (Autoregressive Integrated Moving Average Model): Extends ARMA to include differencing of the data, useful for non-stationary time series.
-
-SARIMA (Seasonal ARIMA): Extends ARIMA to account for seasonality in data.
-'''
+    streamlit run 02_apps/time_series/forecasting/main.py
+"""
 
 import streamlit as st
 import numpy as np
