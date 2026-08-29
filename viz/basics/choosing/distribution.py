@@ -43,7 +43,7 @@ save(fig, __file__, "bin-width")
 # Three datasets, deliberately built to share a five-number summary while
 # looking nothing alike.
 # The parameters are chosen so all three share a five-number summary: their
-# quartiles agree to within about 1.5 units. That is the whole point -- the
+# quartiles agree to within about 2 points. That is the whole point -- the
 # box plot cannot tell them apart, and the histogram below cannot miss.
 rng = np.random.default_rng(7)
 normal = rng.normal(50, 11.86, 400)                       # IQR ~16
