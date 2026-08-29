@@ -190,21 +190,26 @@ def test_predict_requires_a_key():
         app.dependency_overrides.clear()
 
 
+class _StubModel:
+    """Stands in for the trained model, so no test ever fits one.
+
+    TestClient does not run the lifespan handler unless you use it as a
+    context manager, so the real model is never trained here -- which is
+    exactly what keeps this suite fast and offline.
+    """
+    estimator = type("Stub", (), {})()
+    features = ["a", "b"]
+    target_names = ["benign", "malignant"]
+    accuracy = 0.99
+    trained_on = "stub"
+
+    def predict(self, rows):
+        return [("benign", 0.87) for _ in rows]
+
+
 def test_predict_with_a_fake_model():
-    """No training in the test suite -- a stub stands in for the real model."""
-
-    class StubModel:
-        estimator = type("Stub", (), {})()
-        features = ["a", "b"]
-        target_names = ["benign", "malignant"]
-        accuracy = 0.99
-        trained_on = "stub"
-
-        def predict(self, rows):
-            return [("benign", 0.87) for _ in rows]
-
     original = model_module.get_model()
-    model_module.set_model(StubModel())
+    model_module.set_model(_StubModel())
     client = make_client()
     try:
         response = client.post(
@@ -224,12 +229,22 @@ def test_predict_with_a_fake_model():
 
 
 def test_predict_rejects_an_empty_batch():
+    """422 for a bad body -- but only once a model exists.
+
+    Worth understanding: dependencies are resolved before the body is
+    validated, so with no model loaded this route answers 503 and the 422
+    never happens. A test that forgot the stub would "pass" for the wrong
+    reason, or fail confusingly. Install the stub, then assert.
+    """
+    original = model_module.get_model()
+    model_module.set_model(_StubModel())
     client = make_client()
     try:
         response = client.post("/model/predict", json={"rows": []},
                                headers={"X-API-Key": TEST_KEY})
-        assert response.status_code == 422
+        assert response.status_code == 422, response.status_code
     finally:
+        model_module.set_model(original)
         app.dependency_overrides.clear()
 
 
