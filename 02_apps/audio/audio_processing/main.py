@@ -1,10 +1,13 @@
 import math
+import warnings
+
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.transforms as mpt
 
 import librosa
+from sklearn.exceptions import ConvergenceWarning
 
 import utils
 
@@ -105,6 +108,10 @@ def main():
         librosa.display.waveshow(y_harm, sr=sr, alpha=0.5, ax=ax[0], label='Harmonic', color="blue")
         librosa.display.waveshow(y_perc, sr=sr, color='r', alpha=0.5, ax=ax[0], label='Percussive')
         ax[0].set(title='Multiple waveforms')
+        # The legend belongs here -- 'Harmonic'/'Percussive' are the only
+        # labelled artists in the figure. Calling it on the envelope axes
+        # below just warns that it has nothing to put in the box.
+        ax[0].legend()
         ax[0].label_outer()
 
         librosa.display.waveshow(y, sr=sr, ax=ax[1], color="blue")
@@ -114,9 +121,6 @@ def main():
         if is_stereo:
             librosa.display.waveshow(y_stereo, sr=sr, ax=ax[2], color="blue")
             ax[2].set(title='Envelope view, stereo')
-            ax[2].legend()
-        else:
-            ax[1].legend()
 
         st.pyplot(fig2)
 
@@ -160,8 +164,15 @@ def main():
         st.write('***Decompose a magnitude spectrogram into 16 components with NMF***')
 
         S = np.abs(librosa.stft(y))
-        comps, acts = librosa.decompose.decompose(S, n_components=16,
-                                                  sort=True)
+        # NMF stops at max_iter whether or not it has settled, and sklearn's
+        # default of 200 is short for a long clip. 500 covers ordinary audio;
+        # a genuinely hard signal (near-noise) will never converge at any
+        # limit, so we don't let that warn into the server log -- the
+        # components are still fine to look at, just less settled.
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=ConvergenceWarning)
+            comps, acts = librosa.decompose.decompose(S, n_components=16,
+                                                      sort=True, max_iter=500)
 
         layout = [list(".AAAA"), list("BCCCC"), list(".DDDD")]
         fig2_1, ax = plt.subplot_mosaic(layout, constrained_layout=True)
