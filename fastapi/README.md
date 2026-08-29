@@ -21,8 +21,16 @@ python fastapi/run.py endpoints/hello     # run the first lesson
 Open <http://127.0.0.1:8000/docs>. That interactive page is generated from your
 code, and it is where you should try every endpoint in this course.
 
-> **FastAPI is not installed on the course server yet** — everything it depends
-> on already is. `pip install fastapi` is the only new package you need.
+> **FastAPI is not installed on the course server yet** — but everything it
+> depends on already is, and at new enough versions. Install just FastAPI,
+> without letting pip touch anything else:
+>
+> ```bash
+> pip3 install --no-deps fastapi==0.141.1
+> ```
+>
+> Don't install an older FastAPI: versions before ~0.119 cap `starlette` at
+> `<0.42`, and pip would downgrade your `starlette 1.3.1` to satisfy it.
 
 ---
 
@@ -31,7 +39,7 @@ code, and it is where you should try every endpoint in this course.
 | | |
 | --- | --- |
 | **`run.py`** | Lists the lessons and runs one with auto-reload. |
-| **`basics/`** | 25 one-idea-per-file lessons. [Details →](basics/README.md) |
+| **`basics/`** | 24 one-idea-per-file lessons. [Details →](basics/README.md) |
 | **`project/`** | The Data API: all of it, assembled, plus a Streamlit client. [Details →](project/README.md) |
 
 ---
