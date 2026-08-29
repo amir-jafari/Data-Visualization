@@ -11,7 +11,7 @@ st.write('***Overwriting elements in-place using "with" notation:***')
 # st.echo(): use in a with block to draw some code on the app, then execute it.
 with st.echo():
     with st.empty():
-        for seconds in range(60):
+        for seconds in range(10):
             st.write(f"⏳ {seconds} seconds have passed")
             time.sleep(1)
-        st.write("✔️ 1 minute over!")
+        st.write("✔️ 10 seconds over!")

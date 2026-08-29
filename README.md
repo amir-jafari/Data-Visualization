@@ -37,8 +37,8 @@ That's the whole setup. Read on when you want to run files individually.
 | Folder | What it is |
 | --- | --- |
 | **`app.py`** | The launcher. One command, every lesson. |
-| **`01_basics/`** | 57 one-idea-per-file lessons: text, charts, widgets, layout, state. [Details →](01_basics/README.md) |
-| **`02_apps/`** | Full apps that combine those pieces: NLP, vision, audio, ML, time series. [Details →](02_apps/README.md) |
+| **`01_basics/`** | 64 one-idea-per-file lessons: text, charts, widgets, layout, state, caching. [Details →](01_basics/README.md) |
+| **`02_apps/`** | 22 full apps that combine those pieces: NLP, vision, audio, ML, time series, maps. [Details →](02_apps/README.md) |
 | **`s3/`** | Where the data comes from, and the keys to reach it. [Details →](s3/README.md) |
 
 ---
@@ -61,6 +61,12 @@ top to bottom, on every interaction. There is no callback, no event handler —
 a widget just returns its current value. Once that clicks, Streamlit is easy.
 See `01_basics/10_state_and_config/04_session_state.py` for the escape hatch
 when you need something to survive a re-run.
+
+**3b. Learn caching early.** Because the script re-runs constantly, anything
+slow — loading a model, reading a big file — must be wrapped in
+`@st.cache_data` or `@st.cache_resource` or your app crawls.
+`01_basics/10_state_and_config/06_caching.py` shows both, and every app in
+`02_apps/` uses them.
 
 **4. Move to `02_apps/` when you want a project.** Each one is a `main.py` plus
 a `utils.py`, and they need the extra install:
