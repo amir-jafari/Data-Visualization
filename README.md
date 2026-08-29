@@ -4,10 +4,15 @@ Two courses, side by side.
 
 | Folder | What it teaches | Start with |
 | --- | --- | --- |
-| [`streamlit/`](streamlit/) | Building the page a person looks at | `streamlit run streamlit/app.py` |
-| [`fastapi/`](fastapi/) | Building the service behind it | `python fastapi/run.py` |
+| [`viz/`](viz/) | Which chart to draw, and how to draw it honestly | `python viz/run.py` |
+| [`streamlit/`](streamlit/) | Putting it in front of a person | `streamlit run streamlit/app.py` |
+| [`fastapi/`](fastapi/) | Serving the data behind it | `python fastapi/run.py` |
 
 ```bash
+# the visualization course
+pip install -r viz/requirements.txt
+python viz/run.py
+
 # the Streamlit course
 pip install -r streamlit/requirements.txt
 streamlit run streamlit/app.py
@@ -18,8 +23,8 @@ python fastapi/run.py
 ```
 
 Run the commands from this directory (the repo root). Full instructions are in
-[`streamlit/README.md`](streamlit/README.md) and
-[`fastapi/README.md`](fastapi/README.md).
+[`viz/README.md`](viz/README.md), [`streamlit/README.md`](streamlit/README.md)
+and [`fastapi/README.md`](fastapi/README.md).
 
 They meet in `fastapi/project/`: a FastAPI service and a Streamlit page that
 consumes it, which is the shape most real data apps end up in.
