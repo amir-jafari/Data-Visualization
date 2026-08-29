@@ -69,10 +69,14 @@ fig.suptitle("subplot_mosaic: draw the layout as text, get it as Axes",
 fig.tight_layout()
 save(fig, __file__, "mosaic")
 
-# --- 3. when tight_layout gives up -----------------------------------------
-# tight_layout cannot make room for anything placed OUTSIDE the axes, such as
-# a legend anchored beyond the right edge. There are three ways out, and it is
-# worth knowing all three because they act at different moments.
+# --- 3. things that hang outside the axes ----------------------------------
+# A legend anchored past the right edge is the classic case. There are three
+# ways to deal with it, acting at three different moments -- and which ones
+# you NEED depends on your matplotlib version, so measure rather than trust
+# folklore. Measured here on matplotlib 3.9: with no layout call the legend is
+# clipped (it ends 60px past the figure edge); tight_layout() already makes
+# room for it. Older versions did not, which is where the "tight_layout can't
+# handle legends" advice you will read online comes from.
 rng = np.random.default_rng(0)
 x = np.arange(30)
 
@@ -83,29 +87,40 @@ def six_series(ax):
     ax.legend(bbox_to_anchor=(1.02, 1), loc="upper left")
 
 
-# (a) the problem, saved with no rescue -- crop=False, or you would not see it
+# (a) no layout management at all -- the legend runs off the page.
+#     crop=False, or the save would quietly rescue it and hide the problem.
 fig, ax = plt.subplots(figsize=(6, 3))
 six_series(ax)
-ax.set_title("tight_layout: the legend is cut off")
-fig.tight_layout()
-save(fig, __file__, "tight-fails", crop=False)
+ax.set_title("No layout call: the legend runs off the page")
+save(fig, __file__, "no-layout", crop=False)
 
-# (b) fix at DRAW time: constrained_layout knows about the legend
+# (b) fix at DRAW time, option 1: tight_layout, run once, now
+fig, ax = plt.subplots(figsize=(6, 3))
+six_series(ax)
+ax.set_title("tight_layout(): room made for the legend")
+fig.tight_layout()
+save(fig, __file__, "tight-layout", crop=False)
+
+# (c) fix at DRAW time, option 2: constrained_layout, re-run whenever the
+#     figure changes. Slower, but it copes with things added later.
 fig, ax = plt.subplots(figsize=(6, 3), layout="constrained")
 six_series(ax)
-ax.set_title("constrained_layout: room made while drawing")
-save(fig, __file__, "constrained-works", crop=False)
+ax.set_title("constrained_layout: same, and it keeps up with changes")
+save(fig, __file__, "constrained", crop=False)
 
-# (c) fix at SAVE time: bbox_inches="tight" grows the image to fit
+# (d) fix at SAVE time: grow the exported image to fit whatever is there.
+#     This works even when the on-screen figure is wrong -- which is why
+#     vizkit.save() does it for you by default.
 fig, ax = plt.subplots(figsize=(6, 3))
 six_series(ax)
-ax.set_title('savefig(bbox_inches="tight"): image grown to fit')
-fig.tight_layout()
+ax.set_title('savefig(bbox_inches="tight"): export grown to fit')
 save(fig, __file__, "bbox-tight", crop=True)
 
 print("""
   Panels:
     comparing panels?          -> sharey=True, or the comparison is a lie
     layout is not a grid?      -> subplot_mosaic, drawn as text
-    anything outside the axes? -> layout="constrained", not tight_layout()
+    anything outside the axes? -> use a layout manager, or bbox_inches="tight"
+                                  when saving. Check your version -- do not
+                                  trust folklore about which one is broken.
 """)
