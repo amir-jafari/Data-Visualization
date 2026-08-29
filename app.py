@@ -40,6 +40,23 @@ def pretty(name):
     return stem.replace("_", " ").title()
 
 
+def purge_local_modules():
+    """Drop already-imported course-local modules (utils.py, metrics.py, ...).
+
+    Many lessons/apps import a same-named sibling module (almost every app has
+    its own `utils.py`). Python caches imports in sys.modules by name, so
+    without this, the *first* app's utils.py would silently keep being served
+    to every other app that also does `import utils`. Third-party packages
+    live outside ROOT and are untouched, so their cache -- and its speed --
+    is preserved.
+    """
+    root_str = str(ROOT)
+    for name, mod in list(sys.modules.items()):
+        mod_file = getattr(mod, "__file__", None)
+        if mod_file and mod_file.startswith(root_str):
+            del sys.modules[name]
+
+
 @st.cache_data
 def basics_chapters():
     """{chapter dir: [lesson files]} in numeric filename order."""
@@ -104,6 +121,7 @@ with demo_tab:
     # The lesson/app expects to be the main script, and some of them import a
     # sibling module (e.g. utils.py), so put its folder on sys.path first --
     # same as Streamlit does when you run the file directly.
+    purge_local_modules()
     sys.path.insert(0, str(item.parent))
     try:
         runpy.run_path(str(item), run_name="__main__")
