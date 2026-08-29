@@ -16,8 +16,16 @@ and are fetched at runtime. Two files here:
 ## Setup
 
 ```bash
-cp s3/.env.example s3/.env      # then paste your keys into s3/.env
+cp .env.example .env      # then paste your keys into .env at the repo root
 ```
+
+One `.env` at the repo root serves everything — it is the only place the code
+looks. It holds two independent credential sets from two different accounts:
+the `aws_*` keys used here for S3, and the `bedrock_aws_*` keys the chatbot
+demos use for the LLM. Filling in only the `aws_*` block is enough for S3.
+
+> Keep the `bedrock_` prefix on the second set. Pasting it under the plain
+> `aws_*` names overwrites the S3 keys further up the file and breaks both.
 
 `.env` is git-ignored. Real environment variables and `~/.aws/credentials`
 override it if you'd rather use those.
@@ -32,8 +40,9 @@ Learner Lab credentials are temporary. When they die, any app that reads from
 S3 stops and shows a **"AWS keys need to be updated"** panel:
 
 1. Restart your AWS lab and copy the fresh credentials.
-2. Paste `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_SESSION_TOKEN`
-   into `s3/.env` (the session token is **required** for keys starting `ASIA`).
+2. Paste `aws_access_key_id`, `aws_secret_access_key` and `aws_session_token`
+   into the repo-root `.env` (the session token is **required** for keys
+   starting `ASIA`).
 3. Press the retry button in the app — no restart needed.
 
 ## Using it in your own code

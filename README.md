@@ -79,11 +79,12 @@ at runtime. **Lessons 01–04 need nothing.** Anything that loads a CSV, image,
 audio, or video needs AWS keys:
 
 ```bash
-cp s3/.env.example s3/.env      # then paste your keys into s3/.env
+cp .env.example .env      # then paste your keys into .env at the repo root
 ```
 
 If an app shows a **"AWS keys need to be updated"** panel, your Learner Lab
-session expired: restart the lab, paste the fresh keys into `s3/.env`, and press
+session expired: restart the lab, paste the fresh `aws_*` keys into the
+repo-root `.env`, and press
 the retry button in the app. No restart needed. Full details in
 [`s3/README.md`](s3/README.md).
 

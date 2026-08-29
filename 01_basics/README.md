@@ -34,5 +34,5 @@ you need in your own apps.
 
 ## If a lesson asks for AWS keys
 
-The media lessons read their files from S3 rather than from disk. Set up
-`s3/.env` — see [`../s3/README.md`](../s3/README.md).
+The media lessons read their files from S3 rather than from disk. Set up the
+repo-root `.env` — see [`../s3/README.md`](../s3/README.md).

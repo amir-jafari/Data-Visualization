@@ -8,9 +8,11 @@ All data for these apps lives in S3, not on disk:
         data/         the sample datasets, mirroring the 02_apps/ tree
         CheatSheet/   streamlit_cheat_sheet.pdf
 
-Credentials are read from the repo's s3/.env (the same file s3_manager.py uses),
-so when the Learner Lab keys expire you only update that one file. Real
-environment variables and ~/.aws/credentials still win if they are set.
+Credentials are read from the repo-root .env (the same file s3_manager.py uses),
+so when the Learner Lab keys expire you only update that one file. S3 uses the
+AWS_* keys there; the BEDROCK_AWS_* keys in the same file are for the chatbot's
+LLM and are untouched here. Real environment variables and ~/.aws/credentials
+still win if they are set.
 
 Typical use inside an app:
 
@@ -41,14 +43,17 @@ CRED_KEYS = (
     "AWS_DEFAULT_REGION",
 )
 
-# Where to look for a .env, in order. s3/.env is the shared one; a .env at the
-# repo root overrides it if you prefer to keep your keys there.
+# The one .env for the whole repo, at its root. Deliberately the only place we
+# look: a leftover s3/.env with stale keys used to win silently and was very
+# hard to diagnose. S3 uses the aws_* keys there; the bedrock_aws_* ones next
+# to them belong to the chatbot's LLM.
 _HERE = Path(__file__).resolve().parent
-ENV_CANDIDATES = (_HERE / ".env", _HERE.parent / ".env")
+ENV_CANDIDATES = (_HERE.parent / ".env",)
 
 # Whatever was already in the real environment when this module was imported
 # takes precedence over the .env file, so `export AWS_...` still works.
-_REAL_ENV = {k: os.environ.get(k) for k in CRED_KEYS}
+# Checked in both cases, since the .env spells these in lower case.
+_REAL_ENV = {k: os.environ.get(k) or os.environ.get(k.lower()) for k in CRED_KEYS}
 
 
 # --------------------------------------------------------------------------- #
@@ -60,13 +65,20 @@ def env_file():
 
 
 def _read_env_file(path):
+    """
+    KEY=VALUE pairs from a .env, with names upper-cased.
+
+    The .env is written in lower case, matching what AWS hands you, but boto3
+    only reads the upper-case AWS_* variables out of the environment -- so
+    normalise here and either spelling in the file works.
+    """
     values = {}
     for line in path.read_text(encoding="utf-8").splitlines():
         line = line.strip()
         if not line or line.startswith("#") or "=" not in line:
             continue
         key, value = line.split("=", 1)
-        values[key.strip()] = value.strip().strip("'\"")
+        values[key.strip().upper()] = value.strip().strip("'\"")
     return values
 
 

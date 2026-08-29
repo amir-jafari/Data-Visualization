@@ -35,11 +35,16 @@ streamlit run 02_apps/data_mining/classification/main.py
 4. **`api_chatbot`** — a real LLM through AWS Bedrock.
 5. **`agent_tools`** — the same, with tool calling.
 
-The last two need Bedrock credentials, which are separate from the S3 keys:
+The last two need Bedrock credentials. They live in the same repo-root `.env`
+as the S3 keys, but under their own `bedrock_aws_*` names — a separate account
+from the S3 one:
 
 ```bash
-cp 02_apps/nlp/chatbot/.env.example 02_apps/nlp/chatbot/.env
+cp .env.example .env      # then fill in the bedrock_aws_* block
 ```
+
+Keep the `bedrock_` prefix: pasting these under the plain `aws_*` names
+overwrites the S3 keys above them and breaks S3 *and* Bedrock at once.
 
 Both read that one file through the shared `chatbot/bedrock.py`.
 
@@ -47,8 +52,9 @@ Both read that one file through the shared `chatbot/bedrock.py`.
 
 Nothing is stored in this repo. Apps marked *S3 keys* call
 `s3_utils.file_input(...)`, which gives you a picker that browses the course S3
-bucket by default and falls back to uploading your own file. Set up `s3/.env`
-first — see [`../s3/README.md`](../s3/README.md).
+bucket by default and falls back to uploading your own file. Fill in the
+`aws_*` block of the repo-root `.env` first — see
+[`../s3/README.md`](../s3/README.md).
 
 *Downloads a model* means the first run pulls weights from HuggingFace and is
 slow; after that they're cached locally.

@@ -17,7 +17,7 @@ accidentally touch another student's folder.
 Credentials are resolved in this order:
     1. --profile / AWS_PROFILE
     2. AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY in the environment
-    3. a .env file sitting next to this script
+    3. the repo-root .env
     4. ~/.aws/credentials
     5. the IAM role attached to the EC2 instance (nothing to configure)
 """
@@ -36,14 +36,22 @@ BUCKET = "dats-dl"
 PREFIX = "ajafari@gwu.edu/"
 REGION = "us-east-1"
 
-ENV_FILE = Path(__file__).with_name(".env")
+# The one .env for the whole repo, at its root. Only its aws_* keys matter
+# here; bedrock_aws_* belong to the chatbot's LLM.
+ENV_FILE = Path(__file__).resolve().parents[1] / ".env"
 
 
 # --------------------------------------------------------------------------- #
 # credentials / client
 # --------------------------------------------------------------------------- #
 def load_env_file():
-    """Read KEY=VALUE lines from .env without needing python-dotenv."""
+    """
+    Read KEY=VALUE lines from .env without needing python-dotenv.
+
+    Names are upper-cased on the way into the environment: the .env is written
+    in lower case (what AWS gives you), but boto3 only looks for the
+    upper-case AWS_* variables.
+    """
     if not ENV_FILE.is_file():
         return
     for line in ENV_FILE.read_text(encoding="utf-8").splitlines():
@@ -53,7 +61,7 @@ def load_env_file():
         key, value = line.split("=", 1)
         value = value.strip().strip("'\"")
         if value:  # a blank value would shadow a real one from the environment
-            os.environ.setdefault(key.strip(), value)
+            os.environ.setdefault(key.strip().upper(), value)
 
 
 def credential_hint(code):
