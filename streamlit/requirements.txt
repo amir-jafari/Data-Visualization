@@ -1,0 +1,20 @@
+# Core stack -- everything in basics/ and the launcher (app.py).
+# Small and fast: this is all you need for the lessons.
+#
+# Versions match the course server. Streamlit 1.60 needs Python >= 3.10.
+
+streamlit==1.60.0
+
+numpy==2.0.2
+pandas==3.0.5
+jinja2==3.1.6           # pandas' df.style accessor needs it (02_dataframes/02_styling.py)
+matplotlib==3.11.1
+pillow==12.3.0
+scipy==1.13.1          # plotly's create_distplot needs it (03_charts/08_plotly.py)
+
+# charts used by basics/charts
+plotly==6.2.0
+altair==6.2.2
+
+# all sample data and media are read from S3 -- see s3/README.md
+boto3==1.43.56
