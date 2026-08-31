@@ -3,26 +3,59 @@ Shared helpers for the visualization lessons.
 
 Two jobs only:
 
-  * save(fig, __file__)  -- put a figure in viz/output/, so it works over SSH
-    on a headless server where plt.show() draws nothing
-  * sample data          -- small, seeded, offline tables, so every lesson
+  * save(fig, LESSON) -- put a figure in viz/output/, AND leave it on screen
+    when you are in a notebook, so the same call works in both places
+  * sample data       -- small, seeded, offline tables, so every lesson
     produces the same picture on every machine, every time
 
-Lessons import it with the same four lines the Streamlit apps use:
+Notebooks bootstrap it in their setup cell, since a notebook has no __file__
+to start from:
 
     import sys
     from pathlib import Path
-    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+    VIZ = next(p for p in [Path.cwd(), *Path.cwd().parents]
+               if (p / "vizkit.py").exists())
+    sys.path.insert(0, str(VIZ))
+
     from vizkit import save, sales
+    LESSON = "choosing/comparison"
+
+`save()` takes either a "chapter/lesson" string (what the notebooks pass) or
+a script's own __file__, and works out where the picture belongs from it.
+
+Backend note: on a plain `python foo.py` run this forces the Agg backend, so
+a lesson never dies with "no display" on a headless course server. Inside a
+Jupyter kernel it leaves the backend alone, so figures appear under the cell.
 """
 
+import os
 from pathlib import Path
 
 import matplotlib
 
+
+def in_notebook():
+    """True inside a Jupyter kernel, False for `python lesson.py`.
+
+    The two need opposite behaviour: a script must never try to open a window,
+    a notebook must never have its figures closed before they are displayed.
+    """
+    try:
+        from IPython import get_ipython
+    except ModuleNotFoundError:
+        return False
+    shell = get_ipython()
+    return shell is not None and shell.__class__.__name__ == "ZMQInteractiveShell"
+
+
+NOTEBOOK = in_notebook()
+
 # Agg draws to a file instead of a window. Set before pyplot is imported, so
-# a lesson never dies with "no display" on the course server.
-matplotlib.use("Agg")
+# a lesson never dies with "no display" on the course server. In a notebook
+# the inline backend is already doing the right thing -- leave it alone.
+if not NOTEBOOK:
+    matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt          # noqa: E402
 import numpy as np                       # noqa: E402
@@ -32,43 +65,63 @@ VIZ_ROOT = Path(__file__).resolve().parent
 OUTPUT = VIZ_ROOT / "output"
 
 
-def save(fig, source_file, name=None, dpi=110, crop=True):
+def _where(source):
+    """(chapter, stem) for either a "chapter/lesson" string or a __file__.
+
+    Notebooks pass the string, because a notebook has no __file__. Scripts
+    pass their own path. Both end up in the same folder of viz/output/.
+    """
+    text = str(source)
+    if "/" in text and not text.endswith((".py", ".ipynb")) and "\\" not in text:
+        chapter, stem = text.split("/", 1)
+        return chapter, stem
+    path = Path(source).resolve()
+    return path.parent.name, path.stem
+
+
+def save(fig, lesson, name=None, dpi=110, crop=True):
     """Save `fig` under viz/output/<chapter>/<lesson>[-name].png and say where.
 
-    `source_file` is the lesson's own __file__, so the output mirrors the
-    lesson tree and you can always tell which script drew which picture.
+    `lesson` is either "chapter/lesson" (what the notebooks pass) or a
+    script's own __file__, so the output always mirrors the lesson tree and
+    you can tell which lesson drew which picture.
 
     crop=True passes bbox_inches="tight" to savefig, which grows the saved
     image to fit anything hanging outside the axes -- a legend parked to the
     right, for instance. That is usually what you want, which is why it is the
     default. Pass crop=False when you deliberately want to SHOW a layout
-    problem, as foundations/subplots_grid.py does.
+    problem, as foundations/subplots_grid does.
+
+    In a notebook the figure is left open afterwards, so it also appears under
+    the cell. In a script it is closed, so a lesson drawing twenty figures
+    does not slowly eat memory.
     """
-    source = Path(source_file).resolve()
-    chapter = source.parent.name
-    stem = source.stem if name is None else f"{source.stem}-{name}"
+    chapter, base = _where(lesson)
+    stem = base if name is None else f"{base}-{name}"
 
     folder = OUTPUT / chapter
     folder.mkdir(parents=True, exist_ok=True)
     path = folder / f"{stem}.png"
 
     fig.savefig(path, dpi=dpi, bbox_inches="tight" if crop else None)
-    plt.close(fig)
+    if not NOTEBOOK:
+        plt.close(fig)
 
     print(f"  saved  {path.relative_to(VIZ_ROOT.parent)}")
     return path
 
 
-def save_html(chart, source_file, name=None):
+def save_html(chart, lesson, name=None):
     """Same idea as save(), for things that are HTML rather than pixels.
 
     Plotly figures, Altair charts and PyVis networks are interactive, so a PNG
-    would throw away the point of them. Open the saved file in a browser.
+    would throw away the point of them. Open the saved file in a browser, or
+    call show_html() on the returned path to embed it in the notebook.
     """
-    source = Path(source_file).resolve()
-    folder = OUTPUT / source.parent.name
+    chapter, base = _where(lesson)
+    folder = OUTPUT / chapter
     folder.mkdir(parents=True, exist_ok=True)
-    stem = source.stem if name is None else f"{source.stem}-{name}"
+    stem = base if name is None else f"{base}-{name}"
     path = folder / f"{stem}.html"
 
     # Dispatch on the library, not on which methods happen to exist: plotly
@@ -87,6 +140,25 @@ def save_html(chart, source_file, name=None):
 
     print(f"  saved  {path.relative_to(VIZ_ROOT.parent)}   (open in a browser)")
     return path
+
+
+def show_html(path, height=620):
+    """Embed a saved .html file in the notebook, in an iframe.
+
+    Plotly and Altair render themselves if you just put the chart object on
+    the last line of a cell. PyVis does not -- it only knows how to write a
+    file -- so this is how the network lesson gets its graph on screen.
+    """
+    from IPython.display import IFrame
+
+    path = Path(path).resolve()
+    try:
+        source = path.relative_to(Path.cwd()).as_posix()
+    except ValueError:
+        # Notebook is not above the file: walk up with ../ instead. Jupyter
+        # serves anything under the folder it was started in.
+        source = Path(os.path.relpath(path, Path.cwd())).as_posix()
+    return IFrame(src=source, width="100%", height=height)
 
 
 # --------------------------------------------------------------------------- #

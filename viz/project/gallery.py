@@ -1,15 +1,20 @@
 """
 A Streamlit gallery for everything the lessons render.
 
-Ties this folder to the Streamlit course: the figures are made by plain Python
-scripts, and this page just finds and displays them, next to the source that
-drew each one.
+Ties this folder to the Streamlit course: the figures are made by Jupyter
+notebooks, and this page just finds and displays them, next to the notebook
+that drew each one.
+
+It is a .py file rather than a notebook on purpose -- `streamlit run` wants a
+script, and this is the one thing in the folder that is an app rather than a
+lesson.
 
 Run it (after rendering at least one lesson):
     python viz/run.py --all
     streamlit run viz/project/gallery.py
 """
 
+import json
 import sys
 from pathlib import Path
 
@@ -27,6 +32,34 @@ ORDER = ["choosing", "foundations", "color", "annotation", "layout",
 
 st.set_page_config(page_title="Visualization gallery", page_icon="📊",
                    layout="wide")
+
+
+@st.cache_data(show_spinner=False)
+def read_notebook(path: Path):
+    """(intro markdown, [code cell sources]) from a lesson notebook.
+
+    Reading the JSON directly keeps nbformat off the Streamlit app's
+    dependency list -- a notebook is only a dict with a "cells" list.
+    """
+    cells = json.loads(path.read_text(encoding="utf-8"))["cells"]
+    intro = ""
+    code_cells = []
+    for cell in cells:
+        # nbformat writes "source" as either a string or a list of lines.
+        source = cell["source"]
+        text = "".join(source) if isinstance(source, list) else source
+        if cell["cell_type"] == "markdown" and not intro:
+            intro = text.strip()
+        elif cell["cell_type"] == "code":
+            code_cells.append(text.strip())
+
+    # The intro cell opens with the lesson's own "# Title" and closes with a
+    # "---" footer pointing back at this page. Both are noise here.
+    body = intro.split("\n---\n")[0].split("\n")
+    if body and body[0].startswith("# "):
+        body = body[1:]
+    return "\n".join(body).strip(), code_cells
+
 
 st.title("📊 Visualization gallery")
 
@@ -59,17 +92,18 @@ for path in images + pages:
 for lesson, files in lessons.items():
     st.subheader(lesson.replace("_", " "))
 
-    source = (BASICS / chapter / f"{lesson}.py")
+    source = (BASICS / chapter / f"{lesson}.ipynb")
     if not source.exists():
-        source = VIZ / "project" / f"{lesson}.py"
+        source = VIZ / "project" / f"{lesson}.ipynb"
 
     if source.exists():
-        # The docstring is the lesson -- show it before the pictures.
-        text = source.read_text()
-        if text.startswith('"""'):
-            st.info(text.split('"""')[1].strip())
+        intro, code_cells = read_notebook(source)
+        # The notebook's first markdown cell is the lesson -- show it before
+        # the pictures.
+        if intro:
+            st.info(intro)
         with st.expander("Source"):
-            st.code(text, language="python")
+            st.code("\n\n".join(code_cells), language="python")
 
     for path in files:
         if path.suffix == ".png":

@@ -10,18 +10,31 @@ Half library mechanics, half design judgement, because you need both.
 
 ## Start here
 
-```bash
-pip install -r viz/requirements.txt     # should install nothing; it is all there
+The lessons are **Jupyter notebooks**. Open one and run the cells:
 
+```bash
+pip install -r viz/requirements.txt          # should install nothing; it is all there
+
+jupyter lab viz/basics/choosing/comparison.ipynb
+```
+
+Each notebook explains the idea in markdown, draws the figure in the next cell,
+and ends with exercises that ask you to change a number and re-run. That is the
+whole method: read, run, break, re-run.
+
+There is also a headless runner, for the course server, for CI, and for
+refilling the gallery:
+
+```bash
 python viz/run.py                       # the lessons, in reading order
-python viz/run.py choosing/comparison   # run the first one
+python viz/run.py choosing/comparison   # execute one, without opening it
 python viz/run.py --all                 # render all 27
 streamlit run viz/project/gallery.py    # browse the results
 ```
 
-Lessons save PNGs into `viz/output/` rather than opening a window, so they work
-identically over SSH and on a laptop. `viz/output/` is git-ignored — regenerate
-it with `--all`.
+Every notebook also writes its figures into `viz/output/` as it runs, so they
+survive outside the notebook and the gallery has something to show.
+`viz/output/` is git-ignored — regenerate it with `--all`.
 
 ---
 
@@ -30,9 +43,9 @@ it with `--all`.
 | | |
 | --- | --- |
 | **[`CONCEPTS.md`](CONCEPTS.md)** | **The ideas in plain words** — analogies, what to demo live, what students get wrong. Start here if you are teaching it. |
-| **`run.py`** | Lists the lessons and renders one, or all of them. |
-| **`vizkit.py`** | `save()` and the seeded sample data every lesson shares. |
-| **`basics/`** | 25 one-idea-per-file lessons in 8 chapters. [Details →](basics/README.md) |
+| **`run.py`** | Lists the notebooks and executes one, or all of them, headlessly. |
+| **`vizkit.py`** | `save()`, `save_html()` and the seeded sample data every lesson shares. |
+| **`basics/`** | 25 one-idea-per-notebook lessons in 8 chapters. [Details →](basics/README.md) |
 | **`project/`** | The makeover: one chart, six steps, plus a Streamlit gallery. [Details →](project/README.md) |
 
 ---
@@ -65,7 +78,7 @@ zero. Dots are read by position, so they do not. Angles are read badly, which
 is most of the case against pie charts.
 
 **Colour is the loudest signal you have.** Spend it on the one thing you are
-talking about, and grey the rest. `annotation/highlight.py` tells three
+talking about, and grey the rest. `annotation/highlight.ipynb` tells three
 different stories from one dataset by changing nothing but what is grey.
 
 **The words must match the picture.** The capstone's first title claimed
@@ -90,14 +103,23 @@ in `project/` is a Streamlit page, so the two halves meet there.
 
 ## Troubleshooting
 
-**Nothing appears when I run a lesson** — that is expected. They save files.
-Read the printed path, or run `streamlit run viz/project/gallery.py`.
+**No figure appears under a cell** — check the notebook's first code cell ran;
+it contains `%matplotlib inline`. If you ran the lesson through `viz/run.py`
+instead, nothing was ever meant to appear: it renders into `viz/output/` and
+prints the path.
 
 **My figure looks different from the lesson's** — it should not. The sample
 data is seeded. Check you have not edited `vizkit.py`.
 
-**`ModuleNotFoundError: vizkit`** — run the lesson as a file
-(`python viz/basics/color/palettes.py`) or through `viz/run.py`. The lessons
-add `viz/` to the path themselves; copying a snippet elsewhere will not.
+**`ModuleNotFoundError: vizkit`** — the setup cell finds `viz/` by walking up
+from the notebook's own folder until it sees `vizkit.py`, so it only works if
+the notebook is still somewhere under `viz/`. Moved it? Set the path yourself.
+
+**`ModuleNotFoundError` for the kernel, not the lesson** — Jupyter is running a
+different Python from the one you installed the requirements into. Check with
+`import sys; print(sys.executable)` in a cell.
 
 **The gallery says nothing is rendered** — run `python viz/run.py --all` first.
+
+**Git diffs full of base64** — you committed a notebook with its outputs
+stored. `python viz/run.py --strip` clears them again.

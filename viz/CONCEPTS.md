@@ -50,9 +50,9 @@ That ranking explains most of the rules in this folder. It is why bars beat
 pies, why dots beat bars for small differences, and why a heatmap is for
 patterns rather than for reading numbers off.
 
-**Show them.** `choosing/comparison.py` — the same six numbers as an
+**Show them.** `choosing/comparison.ipynb` — the same six numbers as an
 alphabetical vertical bar chart and as a sorted horizontal one. Then
-`choosing/composition.py` — the pie chart, and the same data as bars. Ask the
+`choosing/composition.ipynb` — the pie chart, and the same data as bars. Ask the
 class to rank SQL against Excel from the pie. They cannot. Then show the bars.
 
 **Watch them trip.** Reaching for a chart type because it is available in the
@@ -67,7 +67,7 @@ in words, before you pick?"*
 number. A line's **slope** is the message, and slope survives a shifted
 baseline.
 
-**Show them.** `misleading/truncated_axis.py` prints the measurement:
+**Show them.** `misleading/truncated_axis.ipynb` prints the measurement:
 
 | axis starts at | tallest bar *looks* | true ratio |
 | --- | --- | --- |
@@ -96,12 +96,12 @@ compressed.
 
 **Show them.** Two figures, and they are the best pair in the folder.
 
-`choosing/distribution.py` — three datasets built so their **quartiles agree
+`choosing/distribution.ipynb` — three datasets built so their **quartiles agree
 to within about 2 points**. Their box plots are indistinguishable. Their histograms are
 one hump, two humps, and flat. Show the boxes first, ask "are these the same
 data?", let them answer, then reveal the histograms.
 
-`choosing/relationship.py` — Anscombe's quartet. Four datasets with identical
+`choosing/relationship.ipynb` — Anscombe's quartet. Four datasets with identical
 means, variances, correlation and regression line **to two decimal places**
 (the lesson prints the table). One is linear, one is curved, one has an
 outlier dragging the line, one is a single leverage point.
@@ -125,7 +125,7 @@ Using the wrong family makes a false claim before anyone reads a number: a
 sequential palette on categories invents a ranking; a diverging palette
 without a real middle invents a neutral point.
 
-**Show them.** `color/palettes.py` — five fruits coloured with viridis, which
+**Show them.** `color/palettes.ipynb` — five fruits coloured with viridis, which
 silently implies apple < banana < cherry. Then the same bars in tab10.
 
 **Watch them trip.** Diverging colour maps applied to all-positive data, where
@@ -139,7 +139,7 @@ one line: pin `vmin` and `vmax` symmetrically.
 **The idea.** For a colour map to be honest, equal steps in the data must look
 like equal steps in colour. Rainbow maps fail this badly.
 
-**Show them.** `color/rainbow.py` measures it:
+**Show them.** `color/rainbow.ipynb` measures it:
 
 > **jet's lightness decreases at 92 of 255 steps.** viridis: **0.**
 
@@ -160,7 +160,7 @@ works, it works for everyone.
 **The idea.** If your chart's meaning lives in red-versus-green, roughly 8% of
 men get nothing from it.
 
-**Show them.** `color/colorblind.py` simulates three kinds of colour vision
+**Show them.** `color/colorblind.ipynb` simulates three kinds of colour vision
 deficiency and then *measures* which colour pairs collide:
 
 - **tab10** (matplotlib's default): 2–3 colliding pairs under each type
@@ -181,7 +181,7 @@ apart. It is the single most common accessibility failure in student work.
 **The idea.** Colour is the loudest signal you have. Spending it on all ten
 series spends it on none.
 
-**Show them.** `annotation/highlight.py` is the demo that changes how students
+**Show them.** `annotation/highlight.ipynb` is the demo that changes how students
 draw. **One dataset, three panels, identical axes** — the only difference is
 which line is coloured and which are grey. The three titles are:
 
@@ -191,7 +191,7 @@ which line is coloured and which are grey. The three titles are:
 
 Same data. Three different arguments. Nothing was filtered.
 
-**Then** `annotation/direct_labels.py`: put the series name at the end of the
+**Then** `annotation/direct_labels.ipynb`: put the series name at the end of the
 line and delete the legend. A legend is a lookup table; a label is an answer.
 
 **Say this:** *"A legend makes the reader do homework. Put the name where the
@@ -205,7 +205,7 @@ line is."*
 looking at, which they can already see. *"West overtook East in July"* tells
 them what to conclude — which is why you drew it.
 
-**Show them.** `annotation/titles.py` — the same chart with each title, side by
+**Show them.** `annotation/titles.ipynb` — the same chart with each title, side by
 side, then the finished version: declarative title, subtitle carrying the
 detail, source note, no top/right frame, faint gridlines.
 
@@ -229,19 +229,19 @@ the point: you cannot defend yourself by checking the data.
 
 **Show them,** in this order, and each one prints its own measurement:
 
-**Truncated axis** (`truncated_axis.py`) — 4× exaggeration, shown above.
+**Truncated axis** (`truncated_axis.ipynb`) — 4× exaggeration, shown above.
 
-**Dual axes** (`dual_axis.py`) — one pair of series, three panels, three
+**Dual axes** (`dual_axis.ipynb`) — one pair of series, three panels, three
 opposite conclusions, produced by changing nothing but the two y ranges. The
 crossing point is a property of your scale choices, not of the data. The
 honest alternatives: separate panels, index both to 100, or plot the ratio.
 
-**Bubble area** (`area_vs_radius.py`) — to show B is 8× A, people scale the
+**Bubble area** (`area_vs_radius.ipynb`) — to show B is 8× A, people scale the
 radius by 8, which multiplies the **area by 64**. The eye reads ink. Scale by
 √8 = 2.83 instead. In matplotlib, `scatter(s=...)` is already an area, so pass
 the value, never the square.
 
-**Cherry-picking** (`cherry_picking.py`) — the hardest to spot. A window
+**Cherry-picking** (`cherry_picking.ipynb`) — the hardest to spot. A window
 chosen to reverse a trend; bin boundaries chosen to make a bump appear or
 vanish; a "50% risk reduction" with no baseline.
 
@@ -255,7 +255,7 @@ vanish; a "50% risk reduction" with no baseline.
 
 ## 10. The capstone, and the mistake in it
 
-`project/makeover.py` takes one question through six steps: default →
+`project/makeover.ipynb` takes one question through six steps: default →
 labelled → readable → coloured → focused → finished. Step 1 already contains
 the finding; nothing is added to the data.
 
@@ -263,7 +263,7 @@ the finding; nothing is added to the data.
 
 > *"Morning students score 9 points higher at every level of study."*
 
-It sounds careful. The chart disproves it three ways, and the script prints
+It sounds careful. The chart disproves it three ways, and the notebook prints
 all three:
 
 - **The lines are not parallel.** The gap runs from ~4 points at low study

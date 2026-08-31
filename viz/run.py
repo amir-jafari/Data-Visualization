@@ -5,21 +5,29 @@ Lesson runner for the visualization course.
     python viz/run.py color/palettes     run one lesson
     python viz/run.py palettes           ...the chapter is optional
     python viz/run.py --all              render everything into viz/output/
+    python viz/run.py --all --keep       ...and store the figures IN the
+                                         notebooks, so they can be read
+                                         without a kernel
+    python viz/run.py --strip            clear stored notebook outputs again
     python viz/run.py --clean            delete viz/output/
 
-Every lesson is a plain script you can also run directly:
+The lessons are Jupyter notebooks. The normal way to use one is to open it and
+run the cells yourself:
 
-    python viz/basics/color/palettes.py
+    jupyter lab viz/basics/color/palettes.ipynb
 
-They save PNGs (and a few HTML files) into viz/output/ rather than opening a
-window, so they work the same over SSH on the course server as they do on a
-laptop. To browse the results:
+This script is for the other case -- rendering everything headlessly, on the
+course server or in CI, so the gallery has something to show:
 
+    python viz/run.py --all
     streamlit run viz/project/gallery.py
+
+Executing a notebook here runs it in a real kernel, exactly as opening it
+would, and every `save()` inside writes a PNG (or HTML) into viz/output/.
+Nothing is written back into the notebook unless you pass --keep.
 """
 
 import shutil
-import subprocess
 import sys
 from pathlib import Path
 
@@ -61,12 +69,11 @@ def lessons():
         folder = BASICS / chapter
         if not folder.is_dir():
             continue
-        on_disk = {p.stem: p for p in folder.glob("*.py")}
+        on_disk = {p.stem: p for p in folder.glob("*.ipynb")}
         ordered = [n for n in names if n in on_disk]
         ordered += sorted(n for n in on_disk if n not in names)
         found += [(chapter, name, on_disk[name]) for name in ordered]
-    found += [("project", p.stem, p) for p in sorted(PROJECT.glob("*.py"))
-              if p.stem != "gallery"]
+    found += [("project", p.stem, p) for p in sorted(PROJECT.glob("*.ipynb"))]
     return found
 
 
@@ -78,21 +85,65 @@ def show_list():
             current = chapter
             print(f"\n  {chapter}  --  {BLURB.get(chapter, 'the capstone')}")
         print(f"      {chapter}/{name}")
-    print(f"\nRun one:      python viz/run.py choosing/comparison")
-    print(f"Run them all: python viz/run.py --all")
+    print("\nOpen one:     jupyter lab viz/basics/choosing/comparison.ipynb")
+    print("Render one:   python viz/run.py choosing/comparison")
+    print("Render all:   python viz/run.py --all")
 
 
-def run(path):
-    result = subprocess.run([sys.executable, str(path)], capture_output=True,
-                            text=True)
-    sys.stdout.write(result.stdout)
-    if result.returncode != 0:
-        sys.stderr.write(result.stderr)
-    return result.returncode == 0
+def run(path, keep=False):
+    """Execute one notebook in a real kernel. Returns True if it finished."""
+    try:
+        import nbformat
+        from nbclient import NotebookClient
+    except ModuleNotFoundError:
+        print("  nbclient is missing.  pip install -r viz/requirements.txt")
+        return False
+
+    notebook = nbformat.read(path, as_version=4)
+    # run_path: the kernel's working directory, so the notebook's own
+    # "walk up until vizkit.py appears" bootstrap resolves the same way it
+    # does when you open the file in Jupyter.
+    client = NotebookClient(notebook, timeout=600, kernel_name="python3",
+                            resources={"metadata": {"path": str(path.parent)}})
+    try:
+        client.execute()
+    except Exception as error:                       # noqa: BLE001
+        print(f"  FAILED: {type(error).__name__}: {str(error)[:400]}")
+        return False
+
+    for cell in notebook.cells:
+        for out in cell.get("outputs", []):
+            if out.get("output_type") == "stream":
+                sys.stdout.write(out.get("text", ""))
+
+    if keep:
+        nbformat.write(notebook, path)
+        print(f"  stored outputs in {path.relative_to(HERE.parent)}")
+    return True
+
+
+def strip():
+    import nbformat
+
+    count = 0
+    for _, _, path in lessons():
+        notebook = nbformat.read(path, as_version=4)
+        changed = False
+        for cell in notebook.cells:
+            if cell.get("outputs") or cell.get("execution_count") is not None:
+                cell["outputs"] = []
+                cell["execution_count"] = None
+                changed = True
+        if changed:
+            nbformat.write(notebook, path)
+            count += 1
+    print(f"  cleared stored outputs in {count} notebook(s)")
 
 
 def main():
     args = sys.argv[1:]
+    keep = "--keep" in args
+    args = [a for a in args if a != "--keep"]
 
     if not args:
         show_list()
@@ -106,12 +157,16 @@ def main():
             print("  nothing to clean")
         return
 
+    if args[0] == "--strip":
+        strip()
+        return
+
     if args[0] == "--all":
         every = lessons()
         failed = []
         for chapter, name, path in every:
             print(f"\n=== {chapter}/{name} ===")
-            if not run(path):
+            if not run(path, keep):
                 failed.append(f"{chapter}/{name}")
         print(f"\n{len(every) - len(failed)}/{len(every)} lessons rendered.")
         if failed:
@@ -121,7 +176,7 @@ def main():
         print("  browse it:  streamlit run viz/project/gallery.py")
         return
 
-    target = args[0].removesuffix(".py")
+    target = args[0].removesuffix(".ipynb")
     matches = [(c, n, p) for c, n, p in lessons()
                if target in (n, f"{c}/{n}")]
 
@@ -134,7 +189,8 @@ def main():
               + ", ".join(f"{c}/{n}" for c, n, _ in matches))
         sys.exit(1)
 
-    run(matches[0][2])
+    if not run(matches[0][2], keep):
+        sys.exit(1)
 
 
 if __name__ == "__main__":

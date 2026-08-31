@@ -4,7 +4,8 @@ One dataset, one question, and every idea from `basics/` applied in six
 visible steps.
 
 ```bash
-python viz/project/makeover.py           # renders all six steps
+jupyter lab viz/project/makeover.ipynb   # the six steps, one cell each
+python viz/run.py project/makeover       # or render them headlessly
 streamlit run viz/project/gallery.py     # browse everything, with the source
 ```
 
@@ -41,8 +42,8 @@ disproves it:
 - **Scores are capped at 100** and are piling up on that ceiling, so the
   straight-line fits predict 127 — which is impossible.
 
-The script prints all three. The finished chart draws the ceiling so you can
-watch the fit leave reality.
+The notebook prints all three in its last cell. The finished chart draws the
+ceiling so you can watch the fit leave reality.
 
 That is the real lesson of the folder: a beautiful chart with an overclaiming
 title is worse than an ugly one, because people believe it.
@@ -50,6 +51,10 @@ title is worse than an ugly one, because people believe it.
 ## The gallery
 
 `gallery.py` is a Streamlit page that finds everything under `viz/output/`,
-groups it by lesson, and shows each figure next to the docstring and source
-that produced it. It is also a small demonstration of the two courses meeting:
-plain Python scripts make the figures, Streamlit just displays them.
+groups it by lesson, and shows each figure next to the notebook that produced
+it — the intro markdown as a caption, the code cells in an expander. It is
+also a small demonstration of the two courses meeting: notebooks make the
+figures, Streamlit just displays them.
+
+It is the one `.py` file left in the folder, on purpose: `streamlit run` wants
+a script, and this is an app rather than a lesson.

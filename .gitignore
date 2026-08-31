@@ -15,3 +15,6 @@ venv/
 
 # rendered figures -- regenerate with `python viz/run.py --all`
 viz/output/
+
+# jupyter
+.ipynb_checkpoints/

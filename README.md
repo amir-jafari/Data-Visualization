@@ -4,14 +4,15 @@ Two courses, side by side.
 
 | Folder | What it teaches | Start with |
 | --- | --- | --- |
-| [`viz/`](viz/) | Which chart to draw, and how to draw it honestly | `python viz/run.py` |
+| [`viz/`](viz/) | Which chart to draw, and how to draw it honestly | `jupyter lab viz/` |
 | [`streamlit/`](streamlit/) | Putting it in front of a person | `streamlit run streamlit/app.py` |
 | [`fastapi/`](fastapi/) | Serving the data behind it | `python fastapi/run.py` |
 
 ```bash
-# the visualization course
+# the visualization course -- the lessons are notebooks
 pip install -r viz/requirements.txt
-python viz/run.py
+jupyter lab viz/basics/choosing/comparison.ipynb
+python viz/run.py                 # ...or list and render them headlessly
 
 # the Streamlit course
 pip install -r streamlit/requirements.txt
